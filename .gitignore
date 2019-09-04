@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# Doxygen output
+/docs/html
+/docs/latex
