@@ -29,11 +29,6 @@ clean:
 	rm -f apps/sample_driver.app $(OBJ_FILES)
 	rm -f $(DEP_FILES)
 
-dbg:
-	@echo "SRC_FILES ( $(SRC_FILES) )"
-	@echo "OBJ_FILES ( $(OBJ_FILES) )"
-	@echo "DEP_FILES ( $(DEP_FILES) )"
-
 lint:
 	find . -name "*.cpp" -or -name "*.h" | xargs python cpplint.py --root=src
 
