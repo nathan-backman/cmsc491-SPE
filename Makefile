@@ -4,11 +4,12 @@ CFLAGS=-std=c++14 -Isrc -g -fmax-errors=1
 SRC_FILES = $(shell find src/ -name '*.cpp')
 OBJ_FILES = $(SRC_FILES:.cpp=.o)
 DEP_FILES = $(OBJ_FILES:.o=.d)
+TEST_DIRS = $(sort $(dir $(wildcard tests/*/.)))
+TEST_APPS = $(patsubst tests/%/, tests/%/driver.app, $(TEST_DIRS))
+SAMPLE_CPPS = $(shell ls apps/*.cpp)
+SAMPLE_APPS = $(SAMPLE_CPPS:.cpp=.app)
 
-
-apps/sample_driver.app: apps/sample_driver.cpp $(OBJ_FILES)
-	$(CXX) $(CFLAGS) -o $@ $^
-
+all: $(SAMPLE_APPS)
 
 %.o: %.cpp
 	$(CXX) $(CFLAGS) -o $@ -c $<
@@ -16,18 +17,26 @@ apps/sample_driver.app: apps/sample_driver.cpp $(OBJ_FILES)
 %.d: %.cpp
 	$(CPP) $(CFLAGS) $< -MM -MT $(@:.d=.o) > $@
 
-
 -include $(DEP_FILES)
+
+apps/%.app: apps/%.cpp $(OBJ_FILES)
+	$(CXX) $(CFLAGS) -o $@ $^
+
+tests/%/driver.app: tests/%/driver.cpp $(OBJ_FILES)
+	$(CXX) $(CFLAGS) -o $@ $^
+
 
 run: apps/sample_driver.app
 	$<
 
 
-.PHONY: clean dbg lint format docs
+.PHONY: clean dbg lint format docs tests
 clean:
 	@echo "Cleaning ..."
-	rm -f apps/sample_driver.app $(OBJ_FILES)
+	rm -f $(OBJ_FILES)
+	rm -f $(SAMPLE_APPS)
 	rm -f $(DEP_FILES)
+	rm -f $(TEST_APPS)
 
 lint:
 	find . -name "*.cpp" -or -name "*.h" | xargs python cpplint.py --root=src
@@ -37,3 +46,6 @@ format:
 
 docs:
 	doxygen docs/Doxyfile
+
+tests: $(TEST_APPS)
+	tests/run_tests.sh

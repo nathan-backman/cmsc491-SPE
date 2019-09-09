@@ -13,11 +13,11 @@ Ultimately this contrived sample performs 2 filters and 1 transformation.
   4) Output (print) tuples
 
 ### Input data format
-Format: ```siteID    temp\n```
+Format: ```siteID    temp```
   * **siteID:** In the format: ```"site_%d"```
   * **temp:** In the format: ```"%.1f"``` in range [-50, 120]
 
 ### Output format
-Format: ```siteID    temp\n```
+Format: ```siteID    temp```
   * **siteID:** In the format: ```"site_%d"```
   * **temp:** In the format: ```"%+.1f"``` in range [-10, 10]
