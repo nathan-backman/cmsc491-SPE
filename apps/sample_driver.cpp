@@ -21,7 +21,7 @@ class OutputOp : public Operator {
 };
 
 int main(int argc, char** argv) {
-  std::cout << "Hello World" << std::endl;
+  std::cout << "SPE Starting up." << std::endl;
 
   IncrementOp incOp;
   OutputOp outOp;
@@ -42,5 +42,6 @@ int main(int argc, char** argv) {
     }
   } while (stillProcessing == true);
 
+  std::cout << "SPE Finished." << std::endl;
   return 0;
 }
