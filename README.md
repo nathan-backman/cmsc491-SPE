@@ -19,6 +19,7 @@ The following instructions explain how to use **```make```** to compile, run the
   * **To autoformat code with respect to formatting guidelines:** ```make format```
   * **To generate documentation in the docs folder:** ```make docs```
   * **To clean up (delete) object files & binaries:** ```make clean```
+  * **To run the suite of tests in the tests folder:** ```make tests```
 
 # Class Roster
   * Students
