@@ -30,7 +30,7 @@ class TransformTemp : public Operator {
     temp = temp - 32.0f;
 
     char tempBuf[8];
-    sprintf(tempBuf, "%+.1f", temp);
+    snprintf(tempBuf, sizeof(tempBuf), "%+.1f", temp);
 
     std::string newVal = data.value.substr(0, start) + std::string(tempBuf);
     emit(Data(newVal, data.timestamp));

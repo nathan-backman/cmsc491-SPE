@@ -31,13 +31,14 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  srand(time(NULL));
+  int seedp = time(NULL);
   const float minF = -50.0;
   const float maxF = 120.0;
   for (int i = 1; i <= D; i++) {
-    float r = ((float)rand()) / ((float)RAND_MAX);
+    float r = (static_cast<float>(rand_r(&seedp))) /
+              (static_cast<float>(RAND_MAX));
     float temp = minF + r * (maxF - minF);
-    int sensID = (rand() % S) + 1;
+    int sensID = (rand_r(&seedp) % S) + 1;
     printf("site_%d %.1f\n", sensID, temp);
   }
 
