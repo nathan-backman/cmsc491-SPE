@@ -4,26 +4,43 @@
 #include <vector>
 #include "SPE.h"
 
+class IncrementOp : public Operator {
+ public:
+  void processData(Data data) {
+    int num = std::stoi(data.value);
+    num++;
+    num *= 10;
+    data.value = std::to_string(num);
+    emit(data);
+  }
+};
+
+class OutputOp : public Operator {
+ public:
+  void processData(Data data) { std::cout << data.value << std::endl; }
+};
+
 int main(int argc, char** argv) {
-  std::cout << "SPE Started" << std::endl;
+  std::cout << "Hello World" << std::endl;
 
-  // TODO(hw1): Create Operators
+  IncrementOp incOp;
+  OutputOp outOp;
 
-  // TODO(hw1): Supply initial operator with data
+  incOp.output = &(outOp.input);
 
-  // TODO(hw1): Itemize operators in a vector
-  std::vector<Operator*> ops;
+  for (int i = 1; i < 10; i += 2) {
+    incOp.input.push(Data(std::to_string(i)));
+  }
 
-  // Main processing loop -- keep processing until there is nothing left
+  std::vector<Operator*> ops = {&incOp, &outOp};
+
   bool stillProcessing;
   do {
     stillProcessing = false;
-    // Execute each operator in a round-robin format
     for (auto op : ops) {
       if (op->execute() == true) stillProcessing = true;
     }
   } while (stillProcessing == true);
 
-  std::cout << "SPE Finished" << std::endl;
   return 0;
 }

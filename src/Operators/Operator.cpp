@@ -1,10 +1,17 @@
 // Copyright 2019 [BVU CMSC491 class]
 #include "Operators/Operator.h"
 
-/// @todo Implement the execute method
 bool Operator::execute() {
-  return false;  // Replace this line
+  if (input.empty() == false) {
+    Data data = input.front();
+    input.pop();
+
+    processData(data);
+
+    return true;
+  } else {
+    return false;
+  }
 }
 
-/// @todo Implement the emit method
-void Operator::emit(Data data) {}
+void Operator::emit(Data data) { output->push(data); }
