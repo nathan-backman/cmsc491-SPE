@@ -1,5 +1,5 @@
 CXX=g++
-CFLAGS=-std=c++14 -Isrc -g -fmax-errors=1
+CFLAGS=-std=c++17 -Isrc -g -fmax-errors=1
 
 SRC_FILES = $(shell find src/ -name '*.cpp')
 OBJ_FILES = $(SRC_FILES:.cpp=.o)
