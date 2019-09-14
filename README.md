@@ -1,5 +1,6 @@
 # cmsc491-SPE
-This is a stream processing engine developed by the fall 2019 class of CMSC 491.
+This is a stream processing engine developed by the fall 2019 class of CMSC 
+491.
 
 ## Build environment
   * Build tools
@@ -12,14 +13,17 @@ This is a stream processing engine developed by the fall 2019 class of CMSC 491.
     * doxygen
 
 # Build instructions
-The following instructions explain how to use **```make```** to compile, run the app, check code formatting, automatically correct formatting, and build documentation.
+The following instructions explain how to use **```make```** to compile, run 
+the app, check code formatting, automatically correct formatting, and build 
+documentation.  
   * **To compile:** ```make```
   * **To run the sample_driver.app:** ```make run```
   * **To check compliance with formatting guidelines:** ```make lint```
-  * **To autoformat code with respect to formatting guidelines:** ```make format```
+  * **To autoformat code w.r.t. formatting guidelines:** ```make format```
   * **To generate documentation in the docs folder:** ```make docs```
   * **To clean up (delete) object files & binaries:** ```make clean```
   * **To run the suite of tests in the tests folder:** ```make tests```
+  * **To run CPU intensive tests to profile the system:** ```make profiler```
 
 # Class Roster
   * Students
