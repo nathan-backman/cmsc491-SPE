@@ -4,6 +4,14 @@
 #include <vector>
 #include "SPE.h"
 
+class NumberGenerator : public InputSource {
+  void generateData() {
+    for (int i = 1; i <= 1000000; i++) {
+      emit(Data(std::to_string(i)));
+    }
+  }
+};
+
 //### Operator Workflow
 //  1) Receive data and emit the same data (the *identity* operator)
 //  2) Output (print) tuples
@@ -24,27 +32,14 @@ class PrintData : public Operator {
 };
 
 int main(int argc, char** argv) {
+  NumberGenerator inputSource;
   IdentityOp op1;
   PrintData op2;
 
-  op1.output = &(op2.input);
-
-  std::vector<Operator*> ops{&op1, &op2};
-
-  int tupleCount = 0;
-
-  // Main processing loop -- keep processing until there is nothing left
-  bool stillProcessing;
-  do {
-    while (++tupleCount <= 1000000)
-      op1.input.push(Data(std::to_string(tupleCount)));
-
-    stillProcessing = false;
-    // Execute each operator in a round-robin format
-    for (auto op : ops) {
-      if (op->execute() == true) stillProcessing = true;
-    }
-  } while (stillProcessing == true);
+  StreamProcessingEngine spe;
+  spe.addInputSource(&inputSource, {&op1});
+  spe.connectOperators(&op1, {&op2});
+  spe.run();
 
   return 0;
 }

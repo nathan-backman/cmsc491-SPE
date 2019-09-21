@@ -4,6 +4,15 @@
 #include <vector>
 #include "SPE.h"
 
+class FileReader : public InputSource {
+  void generateData() {
+    std::string line;
+    while (getline(std::cin, line)) {
+      emit(Data(line));
+    }
+  }
+};
+
 //### Operator Workflow
 //  1) Filter out (remove) tuples from odd sensor sites (Ex. remove "site_3")
 //  2) Transform temperatures to show their distance from freezing (32.0F)
@@ -55,31 +64,18 @@ class PrintData : public Operator {
 };
 
 int main(int argc, char** argv) {
+  FileReader inputSource;
   DropOdds op1;
   TransformTemp op2;
   DropTemps op3;
   PrintData op4;
 
-  op1.output = &(op2.input);
-  op2.output = &(op3.input);
-  op3.output = &(op4.input);
-
-  std::vector<Operator*> ops{&op1, &op2, &op3, &op4};
-
-  std::string line;
-  while (getline(std::cin, line)) {
-    op1.input.push(Data(line));
-  }
-
-  // Main processing loop -- keep processing until there is nothing left
-  bool stillProcessing;
-  do {
-    stillProcessing = false;
-    // Execute each operator in a round-robin format
-    for (auto op : ops) {
-      if (op->execute() == true) stillProcessing = true;
-    }
-  } while (stillProcessing == true);
+  StreamProcessingEngine spe;
+  spe.addInputSource(&inputSource, {&op1});
+  spe.connectOperators(&op1, {&op2});
+  spe.connectOperators(&op2, {&op3});
+  spe.connectOperators(&op3, {&op4});
+  spe.run();
 
   return 0;
 }

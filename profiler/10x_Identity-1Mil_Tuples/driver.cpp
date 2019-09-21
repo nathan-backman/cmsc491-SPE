@@ -4,6 +4,14 @@
 #include <vector>
 #include "SPE.h"
 
+class NumberGenerator : public InputSource {
+  void generateData() {
+    for (int i = 1; i <= 1000000; i++) {
+      emit(Data(std::to_string(i)));
+    }
+  }
+};
+
 //### Operator Workflow
 //  1) Receive data and emit the same data (the *identity* operator)
 //  2) Output (print) tuples
@@ -24,37 +32,23 @@ class PrintData : public Operator {
 };
 
 int main(int argc, char** argv) {
+  NumberGenerator inputSource;
   IdentityOp op1, op2, op3, op4, op5, op6, op7, op8, op9, op10;
   PrintData op11;
 
-  op1.output = &(op2.input);
-  op2.output = &(op3.input);
-  op3.output = &(op4.input);
-  op4.output = &(op5.input);
-  op5.output = &(op6.input);
-  op6.output = &(op7.input);
-  op7.output = &(op8.input);
-  op8.output = &(op9.input);
-  op9.output = &(op10.input);
-  op10.output = &(op11.input);
-
-  std::vector<Operator*> ops{&op11, &op10, &op9, &op8, &op7,
-                             &op6, &op5, &op4, &op3, &op2, &op1};
-
-  int tupleCount = 0;
-
-  // Main processing loop -- keep processing until there is nothing left
-  bool stillProcessing;
-  do {
-    while (++tupleCount <= 1000000)
-      op1.input.push(Data(std::to_string(tupleCount)));
-
-    stillProcessing = false;
-    // Execute each operator in a round-robin format
-    for (auto op : ops) {
-      if (op->execute() == true) stillProcessing = true;
-    }
-  } while (stillProcessing == true);
+  StreamProcessingEngine spe;
+  spe.addInputSource(&inputSource, {&op1});
+  spe.connectOperators(&op1, {&op2});
+  spe.connectOperators(&op2, {&op3});
+  spe.connectOperators(&op3, {&op4});
+  spe.connectOperators(&op4, {&op5});
+  spe.connectOperators(&op5, {&op6});
+  spe.connectOperators(&op6, {&op7});
+  spe.connectOperators(&op7, {&op8});
+  spe.connectOperators(&op8, {&op9});
+  spe.connectOperators(&op9, {&op10});
+  spe.connectOperators(&op10, {&op11});
+  spe.run();
 
   return 0;
 }
