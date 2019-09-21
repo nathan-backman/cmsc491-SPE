@@ -33,21 +33,14 @@ class PrintData : public Operator {
 
 int main(int argc, char** argv) {
   NumberGenerator inputSource;
-  IdentityOp op1, op2, op3, op4, op5, op6, op7, op8, op9, op10;
-  PrintData op11;
+  std::vector<IdentityOp> iOp(10);
+  PrintData finalOp;
 
   StreamProcessingEngine spe;
-  spe.addInputSource(&inputSource, {&op1});
-  spe.connectOperators(&op1, {&op2});
-  spe.connectOperators(&op2, {&op3});
-  spe.connectOperators(&op3, {&op4});
-  spe.connectOperators(&op4, {&op5});
-  spe.connectOperators(&op5, {&op6});
-  spe.connectOperators(&op6, {&op7});
-  spe.connectOperators(&op7, {&op8});
-  spe.connectOperators(&op8, {&op9});
-  spe.connectOperators(&op9, {&op10});
-  spe.connectOperators(&op10, {&op11});
+  spe.addInputSource(&inputSource, {&(iOp.front())});
+  for (int i = 0; i < iOp.size()-1; i++)
+    spe.connectOperators(&(iOp[i]), {&(iOp[i+1])});
+  spe.connectOperators(&(iOp.back()), {&finalOp});
   spe.run();
 
   return 0;
