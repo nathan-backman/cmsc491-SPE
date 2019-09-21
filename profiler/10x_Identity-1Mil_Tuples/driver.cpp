@@ -38,8 +38,8 @@ int main(int argc, char** argv) {
 
   StreamProcessingEngine spe;
   spe.addInputSource(&inputSource, {&(iOp.front())});
-  for (int i = 0; i < iOp.size()-1; i++)
-    spe.connectOperators(&(iOp[i]), {&(iOp[i+1])});
+  for (int i = 0; i < iOp.size() - 1; i++)
+    spe.connectOperators(&(iOp[i]), {&(iOp[i + 1])});
   spe.connectOperators(&(iOp.back()), {&finalOp});
   spe.run();
 

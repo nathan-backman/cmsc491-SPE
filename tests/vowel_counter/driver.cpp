@@ -23,8 +23,9 @@ class FilterWords : public Operator {
   void processData(Data data) {
     int count = 0;
     for (int i = 0; i < data.value.size(); i++) {
-      if (data.value[i] == 'i' || data.value[i] == 'o' || data.value[i] == 'u'
-          || data.value[i] == 'e' || data.value[i] == 'a') {
+      if (data.value[i] == 'i' || data.value[i] == 'o' ||
+          data.value[i] == 'u' || data.value[i] == 'e' ||
+          data.value[i] == 'a') {
         count++;
       }
     }

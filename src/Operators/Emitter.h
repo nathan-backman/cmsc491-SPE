@@ -9,14 +9,14 @@
 class Operator;
 
 /**
- * Abstract class that provides functionality to Operator and InputSource 
+ * Abstract class that provides functionality to Operator and InputSource
  * classes to \ref emit() Data to downstream <span>Operator</span>s.
  */
 class Emitter {
  public:
   /**
    * Invoking this method allows the application programmer to produce data
-   * from within the Operator::processData and InputSource::generateData 
+   * from within the Operator::processData and InputSource::generateData
    * methods.
    *
    * A Data object passed to this method will be placed into the input queues
@@ -28,7 +28,7 @@ class Emitter {
   void emit(const Data &data);
 
   /// A collection of pointers to downstream <span>Operator</span>s.
-  std::vector<Operator*> downstreamOperators;
+  std::vector<Operator *> downstreamOperators;
 };
 
 #endif  // OPERATORS_EMITTER_H_

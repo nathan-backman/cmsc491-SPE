@@ -2,8 +2,8 @@
 #ifndef OPERATORS_OPERATOR_H_
 #define OPERATORS_OPERATOR_H_
 
+#include <mutex>  // NOLINT
 #include <queue>
-#include <mutex> // NOLINT
 #include "Data/Data.h"
 #include "Operators/Emitter.h"
 
@@ -72,7 +72,7 @@ class Operator : public Emitter {
   virtual void processData(Data data) = 0;
 
   /**
-   * A wrapper around `input.push(data)` that protects the \ref input queue 
+   * A wrapper around `input.push(data)` that protects the \ref input queue
    * with a `std::mutex`.
    *
    * @param data The Data object to add to the \ref input queue
