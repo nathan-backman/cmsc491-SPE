@@ -20,27 +20,28 @@ class OutputOp : public Operator {
   void processData(Data data) { std::cout << data.value << std::endl; }
 };
 
+class NumberGenerator : public InputSource {
+  void generateData() {
+    for (int i = 1; i < 10; i += 2) {
+      emit(Data(std::to_string(i)));
+    }
+  }
+};
+
+
 int main(int argc, char** argv) {
   std::cout << "SPE Starting up." << std::endl;
 
-  IncrementOp incOp;
-  OutputOp outOp;
+  NumberGenerator inputSource;
+  IncrementOp op1;
+  OutputOp op2;
 
-  incOp.output = &(outOp.input);
+  StreamProcessingEngine spe;
 
-  for (int i = 1; i < 10; i += 2) {
-    incOp.input.push(Data(std::to_string(i)));
-  }
+  spe.addInputSource(&inputSource, {&op1});
+  spe.connectOperators(&op1, {&op2});
 
-  std::vector<Operator*> ops = {&incOp, &outOp};
-
-  bool stillProcessing;
-  do {
-    stillProcessing = false;
-    for (auto op : ops) {
-      if (op->execute() == true) stillProcessing = true;
-    }
-  } while (stillProcessing == true);
+  spe.run();
 
   std::cout << "SPE Finished." << std::endl;
   return 0;

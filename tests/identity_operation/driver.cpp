@@ -4,6 +4,15 @@
 #include <vector>
 #include "SPE.h"
 
+class FileReader : public InputSource {
+  void generateData() {
+    std::string line;
+    while (getline(std::cin, line)) {
+      emit(Data(line));
+    }
+  }
+};
+
 //### Operator Workflow
 //  1) Receive data and emit the same data (the *identity* operator)
 //  2) Output (print) tuples
@@ -21,27 +30,14 @@ class PrintData : public Operator {
 };
 
 int main(int argc, char** argv) {
+  FileReader inputSource;
   IdentityOp op1;
   PrintData op2;
 
-  op1.output = &(op2.input);
-
-  std::vector<Operator*> ops{&op1, &op2};
-
-  std::string line;
-  while (getline(std::cin, line)) {
-    op1.input.push(Data(line));
-  }
-
-  // Main processing loop -- keep processing until there is nothing left
-  bool stillProcessing;
-  do {
-    stillProcessing = false;
-    // Execute each operator in a round-robin format
-    for (auto op : ops) {
-      if (op->execute() == true) stillProcessing = true;
-    }
-  } while (stillProcessing == true);
+  StreamProcessingEngine spe;
+  spe.addInputSource(&inputSource, {&op1});
+  spe.connectOperators(&op1, {&op2});
+  spe.run();
 
   return 0;
 }

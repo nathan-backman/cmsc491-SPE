@@ -23,8 +23,10 @@ copen 5
 tabnew apps/sample_driver.cpp
 copen 5
 
+CppSplit src/Engine/StreamProcessingEngine
 CppSplit src/Operators/Operator
-CppSplit src/Data/Data
+"CppSplit src/Data/Data
+CppSplit src/Operators/InputSource
 
 
 

@@ -4,5 +4,6 @@
 
 #include "Data/Data.h"
 #include "Operators/Operator.h"
+#include "Engine/StreamProcessingEngine.h"
 
 #endif  // SPE_H_
