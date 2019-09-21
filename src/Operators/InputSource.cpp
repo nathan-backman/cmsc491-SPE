@@ -5,6 +5,4 @@ void InputSource::startThread() {
   inputThread = std::thread(&InputSource::generateData, this);
 }
 
-void InputSource::waitForCompletion() {
-  inputThread.join();
-}
+void InputSource::waitForCompletion() { inputThread.join(); }

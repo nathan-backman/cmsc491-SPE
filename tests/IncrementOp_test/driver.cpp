@@ -13,17 +13,17 @@ class FileReader : public InputSource {
   }
 };
 
-//### Operator Workflow
-//  1) Receive data and emit the same data (the *identity* operator)
-//  2) Output (print) tuples
-
-// 1) Receive data and emit the same data (the *identity* operator)
-class IdentityOp : public Operator {
+class IncrementOp : public Operator {
  public:
-  void processData(Data data) { emit(data); }
+  void processData(Data data) {
+    int num = std::stoi(data.value);
+    num++;
+    num *= 10;
+    data.value = std::to_string(num);
+    emit(data);
+  }
 };
 
-// 2) Output (print) tuples
 class PrintData : public Operator {
  public:
   void processData(Data data) { std::cout << data.value << std::endl; }
@@ -31,7 +31,7 @@ class PrintData : public Operator {
 
 int main(int argc, char** argv) {
   FileReader inputSource;
-  IdentityOp op1;
+  IncrementOp op1;
   PrintData op2;
 
   StreamProcessingEngine spe;

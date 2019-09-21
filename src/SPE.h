@@ -3,7 +3,7 @@
 #define SPE_H_
 
 #include "Data/Data.h"
-#include "Operators/Operator.h"
 #include "Engine/StreamProcessingEngine.h"
+#include "Operators/Operator.h"
 
 #endif  // SPE_H_

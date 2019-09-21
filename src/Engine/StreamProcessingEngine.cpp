@@ -2,8 +2,7 @@
 #include "Engine/StreamProcessingEngine.h"
 
 void StreamProcessingEngine::connectOperators(
-    Operator* upstreamOp,
-    std::vector<Operator*> downstreamOps) {
+    Operator* upstreamOp, std::vector<Operator*> downstreamOps) {
   // Register the downstream operators with the upstream operator
   upstreamOp->downstreamOperators = downstreamOps;
 
@@ -14,9 +13,7 @@ void StreamProcessingEngine::connectOperators(
 }
 
 void StreamProcessingEngine::addInputSource(
-    InputSource *inputSource,
-    std::vector<Operator*> downstreamOps) {
-
+    InputSource* inputSource, std::vector<Operator*> downstreamOps) {
   // Register the downstream operators with the upstream operator
   inputSource->downstreamOperators = downstreamOps;
 
@@ -44,12 +41,10 @@ void StreamProcessingEngine::run() {
 
 void StreamProcessingEngine::launchInputs() {
   // Launch threads
-  for (auto inputSource : inputSources)
-    inputSource->startThread();
+  for (auto inputSource : inputSources) inputSource->startThread();
 
   // Join threads
-  for (auto inputSource : inputSources)
-    inputSource->waitForCompletion();
+  for (auto inputSource : inputSources) inputSource->waitForCompletion();
 
   // Flag the operator execution code to signal that no more Data is coming
   receivingInput = false;

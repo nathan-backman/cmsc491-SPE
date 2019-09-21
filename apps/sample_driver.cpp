@@ -28,7 +28,6 @@ class NumberGenerator : public InputSource {
   }
 };
 
-
 int main(int argc, char** argv) {
   std::cout << "SPE Starting up." << std::endl;
 
