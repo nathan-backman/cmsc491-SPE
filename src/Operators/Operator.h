@@ -4,6 +4,7 @@
 
 #include <queue>
 #include "Data/Data.h"
+#include "Operators/Emitter.h"
 
 /**
  * An abstract class that denotes the interconnectivity of user-defined
@@ -14,7 +15,7 @@
  * are meant to implement the processData() method which defines how the
  * user-defined operator intends to process data.
  */
-class Operator {
+class Operator : public Emitter {
  public:
   /**
    * The operator scheduler invokes this method to have an operator process
@@ -69,23 +70,8 @@ class Operator {
    */
   virtual void processData(Data data) = 0;
 
-  /**
-   * Invoking this method allows the application programmer to produce data
-   * from within the `processData` method.
-   *
-   * A Data object passed to this method will be placed into the input queues
-   * of the immediate downstream operators.
-   *
-   * @param data The Data object that the Operator produces as a result of
-   * processing its input data.
-   */
-  void emit(Data data);
-
   /// Data waiting to be processed by the Operator
   std::queue<Data> input;
-
-  /// A pointer to the input queue of the downstream operator.
-  std::queue<Data> *output;
 };
 
 #endif  // OPERATORS_OPERATOR_H_

@@ -13,5 +13,3 @@ bool Operator::execute() {
     return false;
   }
 }
-
-void Operator::emit(Data data) { output->push(data); }

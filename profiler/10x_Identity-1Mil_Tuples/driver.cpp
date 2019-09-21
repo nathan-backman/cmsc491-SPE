@@ -38,7 +38,8 @@ int main(int argc, char** argv) {
   op9.output = &(op10.input);
   op10.output = &(op11.input);
 
-  std::vector<Operator*> ops{&op11, &op10, &op9, &op8, &op7, &op6, &op5, &op4, &op3, &op2, &op1};
+  std::vector<Operator*> ops{&op11, &op10, &op9, &op8, &op7,
+                             &op6, &op5, &op4, &op3, &op2, &op1};
 
   int tupleCount = 0;
 
