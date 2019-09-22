@@ -4,10 +4,16 @@ syntax on
 
 
 function! CppSplit(arg)
-  execute "tabnew " . a:arg . ".h"
+  let cppFile = a:arg
+
+  let hFile = split(cppFile, ".cpp")[0]
+  let hFile = split(hFile, "src/")[0]
+  let hFile = "src/include/" . hFile . ".h"
+
+  execute "tabnew " . hFile
   execute "copen 5"
   execute "wincmd k"
-  execute "vsplit " . a:arg . ".cpp"
+  execute "vsplit " . cppFile
   execute "wincmd l"
   execute "vertical resize 80"
   execute "wincmd h"
@@ -23,10 +29,10 @@ copen 5
 tabnew apps/sample_driver.cpp
 copen 5
 
-CppSplit src/Engine/StreamProcessingEngine
-CppSplit src/Operators/Operator
-"CppSplit src/Data/Data
-CppSplit src/Operators/InputSource
+CppSplit src/Engine/StreamProcessingEngine.cpp
+CppSplit src/Operators/Operator.cpp
+"CppSplit src/Data/Data.cpp
+CppSplit src/Operators/InputSource.cpp
 
 
 
