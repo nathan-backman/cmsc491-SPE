@@ -2,20 +2,55 @@
 #include "Operators/Operator.h"
 
 bool Operator::execute() {
-  // TODO(parallel): When we do multithreaded scheduling (many consumers) we
-  // need to also call inputMutex.lock() when checking input.empty().
-  if (input.empty() == false) {
-    // Basic mutex protection when reading/popping from the queue
-    inputMutex.lock();
-    Data data = input.front();
-    input.pop();
-    inputMutex.unlock();
+  // If the range is greater than 1, then it is an aggregate operator and uses
+  // processData(vector<data>) rather than processData(Data)
+  if (range > 1) {
+    // Load the window if this is the first execute of this operator
+    if (window.size() == 0) {
+      inputMutex.lock();
+      if (input.size() < range) {
+        inputMutex.unlock();
+        return false;
+      }
 
-    processData(data);
+      for (int i = 0; i < range; i++) {
+        window.push_back(input.front());
+        input.pop();
+      }
+      inputMutex.unlock();
+    } else {
+      // This is not the first running of the window, add to it
+      inputMutex.lock();
+      if (input.size() < slide) {
+        inputMutex.unlock();
+        return false;
+      }
 
+      // Remove data sliding out, add new data sliding in
+      for (int i = 0; i < slide; i++) {
+        window.pop_front();
+        window.push_back(input.front());
+        input.pop();
+      }
+      inputMutex.unlock();
+    }
+
+    processData();
     return true;
   } else {
-    return false;
+    inputMutex.lock();
+    if (input.empty() == false) {
+      Data data = input.front();
+      input.pop();
+      inputMutex.unlock();
+
+      processData(data);
+
+      return true;
+    } else {
+      inputMutex.unlock();
+      return false;
+    }
   }
 }
 

@@ -2,6 +2,7 @@
 #ifndef OPERATORS_OPERATOR_H_
 #define OPERATORS_OPERATOR_H_
 
+#include <deque>
 #include <mutex>  // NOLINT
 #include <queue>
 #include "Data/Data.h"
@@ -18,6 +19,23 @@
  */
 class Operator : public Emitter {
  public:
+  /// The default constructor for an Operator that does not use a sliding
+  /// window.
+  Operator() {
+    this->range = 1;
+    this->slide = 1;
+  }
+
+  /**
+   * The constructor for an Operator that uses a sliding window. If this
+   * constructor is used, then processData(deque<Data>) will be called during
+   * execture rather than processData(Data)
+   */
+  explicit Operator(int range, int slide) {
+    this->range = range;
+    this->slide = slide;
+  }
+
   /**
    * The operator scheduler invokes this method to have an operator process
    * data.
@@ -69,7 +87,8 @@ class Operator : public Emitter {
    *   emit(outputData);
    * @endcode
    */
-  virtual void processData(Data data) = 0;
+  virtual void processData(Data data) {}
+  virtual void processData() {}
 
   /**
    * A wrapper around `input.push(data)` that protects the \ref input queue
@@ -84,6 +103,17 @@ class Operator : public Emitter {
 
   /// Mutex protecting the \ref input queue
   std::mutex inputMutex;
+
+  /// The range of the window, defaults to 1 if not specified
+  int range;
+
+  /// The slide of the window, defaults to 1 if not specified
+  int slide;
+
+  /** The buffer for the window. It is loaded on the first
+   * executed and updated each execute thereafter
+   */
+  std::deque<Data> window;
 };
 
 #endif  // OPERATORS_OPERATOR_H_
