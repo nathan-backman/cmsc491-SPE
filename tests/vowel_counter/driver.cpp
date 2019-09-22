@@ -14,16 +14,28 @@ class FileReader : public InputSource {
 };
 
 //### Operator Workflow
-//  1) Receive data and emit the same data (the *identity* operator)
-//  2) Output (print) tuples
+//  1) Filter out (remove) tuples that have less than 2 vowels
+//  2) Output (print) the word
 
-// 1) Receive data and emit the same data (the *identity* operator)
-class IdentityOp : public Operator {
+//  1) Filter out (remove) tuples that have less than 2 vowels
+class FilterWords : public Operator {
  public:
-  void processData(Data data) { emit(data); }
+  void processData(Data data) {
+    int count = 0;
+    for (int i = 0; i < data.value.size(); i++) {
+      if (data.value[i] == 'i' || data.value[i] == 'o' ||
+          data.value[i] == 'u' || data.value[i] == 'e' ||
+          data.value[i] == 'a') {
+        count++;
+      }
+    }
+    if (count >= 2) {
+      emit(data);
+    }
+  }
 };
 
-// 2) Output (print) tuples
+// 2) Output (print) words
 class PrintData : public Operator {
  public:
   void processData(Data data) { std::cout << data.value << std::endl; }
@@ -31,7 +43,7 @@ class PrintData : public Operator {
 
 int main(int argc, char** argv) {
   FileReader inputSource;
-  IdentityOp op1;
+  FilterWords op1;
   PrintData op2;
 
   StreamProcessingEngine spe;

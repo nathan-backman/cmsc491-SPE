@@ -31,6 +31,9 @@
 *.out
 *.app
 
+# Swap files
+*.swp
+
 # Doxygen output
 /docs/html
 /docs/latex

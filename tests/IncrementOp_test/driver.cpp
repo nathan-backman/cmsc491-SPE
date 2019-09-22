@@ -1,5 +1,4 @@
 // Copyright 2019 [BVU CMSC491 class]
-#include <deque>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -14,32 +13,25 @@ class FileReader : public InputSource {
   }
 };
 
-class AvgAggOp : public Operator {
+class IncrementOp : public Operator {
  public:
-  AvgAggOp(int r, int s) : Operator(r, s) {}
-
-  void processData(Data data) {}
-
-  void processData() {
-    float total = 0;
-    int count = 0;
-    for (Data d : window) {
-      total += std::stoi(d.value);
-      count++;
-    }
-    emit(Data(std::to_string(total / count)));
+  void processData(Data data) {
+    int num = std::stoi(data.value);
+    num++;
+    num *= 10;
+    data.value = std::to_string(num);
+    emit(data);
   }
 };
 
-// 4) Output (print) tuples
 class PrintData : public Operator {
  public:
-  void processData(Data data) { printf("%.1f\n", std::stof(data.value)); }
+  void processData(Data data) { std::cout << data.value << std::endl; }
 };
 
 int main(int argc, char** argv) {
   FileReader inputSource;
-  AvgAggOp op1(5, 2);
+  IncrementOp op1;
   PrintData op2;
 
   StreamProcessingEngine spe;

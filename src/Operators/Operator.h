@@ -2,10 +2,11 @@
 #ifndef OPERATORS_OPERATOR_H_
 #define OPERATORS_OPERATOR_H_
 
-#include <queue>
 #include <deque>
+#include <mutex>  // NOLINT
+#include <queue>
 #include "Data/Data.h"
-#include <iostream>
+#include "Operators/Emitter.h"
 
 /**
  * An abstract class that denotes the interconnectivity of user-defined
@@ -16,22 +17,24 @@
  * are meant to implement the processData() method which defines how the
  * user-defined operator intends to process data.
  */
-class Operator {
+class Operator : public Emitter {
  public:
-   /// The default constructor for an Operator that does not use a sliding window.
-   Operator() {
-     this->range = 1;
-     this->slide = 1;
-   }
+  /// The default constructor for an Operator that does not use a sliding
+  /// window.
+  Operator() {
+    this->range = 1;
+    this->slide = 1;
+  }
 
-   /** 
-    * The constructor for an Operator that uses a sliding window. If this constructor is used, 
-    * then processData(deque<Data>) will be called during execture rather than processData(Data)
-    */
-   explicit Operator(int range, int slide) {
-     this->range = range;
-     this->slide = slide;
-   }
+  /**
+   * The constructor for an Operator that uses a sliding window. If this
+   * constructor is used, then processData(deque<Data>) will be called during
+   * execture rather than processData(Data)
+   */
+  explicit Operator(int range, int slide) {
+    this->range = range;
+    this->slide = slide;
+  }
 
   /**
    * The operator scheduler invokes this method to have an operator process
@@ -84,34 +87,30 @@ class Operator {
    *   emit(outputData);
    * @endcode
    */
-  virtual void processData(Data data) {};
+  virtual void processData(Data data) {}
   virtual void processData() {}
 
   /**
-   * Invoking this method allows the application programmer to produce data
-   * from within the `processData` method.
+   * A wrapper around `input.push(data)` that protects the \ref input queue
+   * with a `std::mutex`.
    *
-   * A Data object passed to this method will be placed into the input queues
-   * of the immediate downstream operators.
-   *
-   * @param data The Data object that the Operator produces as a result of
-   * processing its input data.
+   * @param data The Data object to add to the \ref input queue
    */
-  void emit(Data data);
+  void addData(const Data &data);
 
   /// Data waiting to be processed by the Operator
   std::queue<Data> input;
 
-  /// A pointer to the input queue of the downstream operator.
-  std::queue<Data> *output;
+  /// Mutex protecting the \ref input queue
+  std::mutex inputMutex;
 
   /// The range of the window, defaults to 1 if not specified
   int range;
 
   /// The slide of the window, defaults to 1 if not specified
   int slide;
-  
-  /** The buffer for the window. It is loaded on the first 
+
+  /** The buffer for the window. It is loaded on the first
    * executed and updated each execute thereafter
    */
   std::deque<Data> window;
