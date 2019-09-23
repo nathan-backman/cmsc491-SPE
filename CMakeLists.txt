@@ -22,16 +22,7 @@ if(MSVC)
   add_compile_options("/W4" "$<$<CONFIG:RELEASE>:/O2>")
 else()
   add_compile_options("-Wall" "-Wextra" "-Werror" "$<$<CONFIG:RELEASE>:-O3>")
-
-#  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-#    add_compile_options("-stdlib=libc++")
-#  else()
-#    # nothing special for gcc at the moment
-#  endif()
 endif()
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fmax-errors=1")
-#if(MSVC)
-#  add_compile_options("/W4"
 
 
 add_subdirectory(src)
