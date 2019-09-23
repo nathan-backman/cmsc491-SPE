@@ -18,7 +18,7 @@ class AvgAggOp : public Operator {
  public:
   AvgAggOp(int r, int s) : Operator(r, s) {}
 
-  void processData(Data data) {}
+  void processData(Data data) { emit(data); }
 
   void processData() {
     float total = 0;
@@ -37,7 +37,7 @@ class PrintData : public Operator {
   void processData(Data data) { printf("%.1f\n", std::stof(data.value)); }
 };
 
-int main(int argc, char** argv) {
+int main() {
   FileReader inputSource;
   AvgAggOp op1(5, 2);
   PrintData op2;

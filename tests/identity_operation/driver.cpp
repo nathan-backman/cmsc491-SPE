@@ -29,7 +29,7 @@ class PrintData : public Operator {
   void processData(Data data) { std::cout << data.value << std::endl; }
 };
 
-int main(int argc, char** argv) {
+int main() {
   FileReader inputSource;
   IdentityOp op1;
   PrintData op2;

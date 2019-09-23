@@ -74,7 +74,7 @@ class PrintData : public Operator {
   void processData(Data data) { std::cout << data.value << std::endl; }
 };
 
-int main(int argc, char** argv) {
+int main() {
   FileReader inputSource;
   DropEmail op1;
   IncrementGames op2;

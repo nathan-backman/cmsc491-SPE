@@ -13,7 +13,7 @@ bool Operator::execute() {
         return false;
       }
 
-      for (int i = 0; i < range; i++) {
+      for (unsigned int i = 0; i < range; i++) {
         window.push_back(input.front());
         input.pop();
       }
@@ -27,7 +27,7 @@ bool Operator::execute() {
       }
 
       // Remove data sliding out, add new data sliding in
-      for (int i = 0; i < slide; i++) {
+      for (unsigned int i = 0; i < slide; i++) {
         window.pop_front();
         window.push_back(input.front());
         input.pop();

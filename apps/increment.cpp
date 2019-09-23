@@ -21,13 +21,13 @@ class OutputOp : public Operator {
 
 class NumberGenerator : public InputSource {
   void generateData() {
-    for (int i = 1; i < 10; i += 2) {
+    for (unsigned int i = 1; i < 10; i += 2) {
       emit(Data(std::to_string(i)));
     }
   }
 };
 
-int main(int argc, char** argv) {
+int main() {
   std::cout << "SPE Starting up." << std::endl;
 
   NumberGenerator inputSource;

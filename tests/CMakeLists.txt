@@ -24,7 +24,6 @@ endforeach(build_target)
 
 add_custom_target(tests
     COMMAND ${spe_TESTS_DIR}/run_tests.sh
+    DEPENDS ${TESTS_TO_BUILD}
     WORKING_DIRECTORY ${spe_TESTS_DIR}
     )
-add_dependencies(tests ${TESTS_TO_BUILD})
-

@@ -22,7 +22,7 @@ class FilterWords : public Operator {
  public:
   void processData(Data data) {
     int count = 0;
-    for (int i = 0; i < data.value.size(); i++) {
+    for (unsigned int i = 0; i < data.value.size(); i++) {
       if (data.value[i] == 'i' || data.value[i] == 'o' ||
           data.value[i] == 'u' || data.value[i] == 'e' ||
           data.value[i] == 'a') {
@@ -41,7 +41,7 @@ class PrintData : public Operator {
   void processData(Data data) { std::cout << data.value << std::endl; }
 };
 
-int main(int argc, char** argv) {
+int main() {
   FileReader inputSource;
   FilterWords op1;
   PrintData op2;

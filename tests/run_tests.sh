@@ -7,7 +7,6 @@ echo "--------------------------------"
 successes=$((0))
 failures=$((0))
 
-cd tests
 for testDir in */; do
   testName="${testDir%?}"
   echo -n "Running test [$testName]: "

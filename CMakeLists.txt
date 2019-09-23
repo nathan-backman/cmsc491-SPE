@@ -9,6 +9,7 @@ project(spe
     LANGUAGES C CXX
     )
 
+message("CMAKE_CXX_COMPILER_ID: [${CMAKE_CXX_COMPILER_ID}]")
 
 
 set(spe_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src")
@@ -17,47 +18,22 @@ set(spe_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/src/include")
 set(spe_TESTS_DIR "${CMAKE_SOURCE_DIR}/tests")
 
 
+if(MSVC)
+  add_compile_options("/W4" "$<$<CONFIG:RELEASE>:/O2>")
+else()
+  add_compile_options("-Wall" "-Wextra" "-Werror" "$<$<CONFIG:RELEASE>:-O3>")
 
-add_library(spe STATIC
-    src/Data/Data.cpp
-    src/Operators/Operator.cpp
-    src/Operators/InputSource.cpp
-    src/Operators/Emitter.cpp
-    src/Engine/StreamProcessingEngine.cpp
-    )
-
-set_target_properties(spe PROPERTIES
-    VERSION ${PROJECT_VERSION}
-    PUBLIC_HEADER src/include/SPE.h
-    LIBRARY_OUTPUT_NAME silly
-    )
-
-
-target_include_directories(spe PRIVATE src/include)
-  
-include(GNUInstallDirs)
-
-# Output directory.
-#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-set(ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-# Compiler flags.
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fmax-errors=1")
+#  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+#    add_compile_options("-stdlib=libc++")
+#  else()
+#    # nothing special for gcc at the moment
+#  endif()
+endif()
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fmax-errors=1")
+#if(MSVC)
+#  add_compile_options("/W4"
 
 
-
-################################################################################
-# DEPENDENCIES
-################################################################################
-
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
-target_link_libraries(spe Threads::Threads)
-
+add_subdirectory(src)
 add_subdirectory(apps)
 add_subdirectory(tests)

@@ -2,7 +2,7 @@
 #ifndef DATA_DATA_H_
 #define DATA_DATA_H_
 
-#include <sys/time.h>
+#include <chrono>
 #include <string>
 
 /**
@@ -39,16 +39,17 @@ class Data {
    * @param value The string representation of the application programmer's
    * data.
    *
-   * @param timestamp The unix timestamp that the application programmer wishes
-   * to apply to the data as it enters the stream processing engine.
+   * @param timestamp A std::chrono timestamp that the application programmer
+   * wishes to apply to the data as it enters the stream processing engine.
    */
-  Data(std::string value, timeval timestamp);
+  Data(std::string value,
+       std::chrono::time_point<std::chrono::system_clock> timestamp);
 
   /// A string representation of the data
   std::string value;
 
   /// The time the data entered the system
-  timeval timestamp;
+  std::chrono::time_point<std::chrono::system_clock> timestamp;
 };
 
 #endif  // DATA_DATA_H_

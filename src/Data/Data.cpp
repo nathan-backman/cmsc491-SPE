@@ -3,10 +3,11 @@
 
 Data::Data(std::string value) {
   this->value = value;
-  gettimeofday(&timestamp, NULL);  // Gets the current time
+  timestamp = std::chrono::system_clock::now(); // Gets the current time
 }
 
-Data::Data(std::string value, timeval timestamp) {
+Data::Data(std::string value,
+           std::chrono::time_point<std::chrono::system_clock> timestamp) {
   this->value = value;
   this->timestamp = timestamp;  // Applies the provided timestamp
 }

@@ -31,7 +31,7 @@ class Operator : public Emitter {
    * constructor is used, then processData(deque<Data>) will be called during
    * execture rather than processData(Data)
    */
-  explicit Operator(int range, int slide) {
+  explicit Operator(unsigned int range, unsigned int slide) {
     this->range = range;
     this->slide = slide;
   }
@@ -87,7 +87,7 @@ class Operator : public Emitter {
    *   emit(outputData);
    * @endcode
    */
-  virtual void processData(Data data) {}
+  virtual void processData(Data data) { emit(data); }
   virtual void processData() {}
 
   /**
@@ -105,10 +105,10 @@ class Operator : public Emitter {
   std::mutex inputMutex;
 
   /// The range of the window, defaults to 1 if not specified
-  int range;
+  unsigned int range;
 
   /// The slide of the window, defaults to 1 if not specified
-  int slide;
+  unsigned int slide;
 
   /** The buffer for the window. It is loaded on the first
    * executed and updated each execute thereafter
