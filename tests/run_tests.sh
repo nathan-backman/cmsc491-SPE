@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 echo "Starting Execution of Test Suite"
 echo "--------------------------------"
 
@@ -13,7 +14,9 @@ for testDir in */; do
 
   cd $testName
 
-  ./driver.app < input.data > test.output
+  ../../build/bin/tests/$testName < input.data > test.output
+
+  #./driver.app < input.data > test.output
   diff output.data test.output > /dev/null
   if [ "$?" -ne "0" ] ; then
     echo -e "\e[1;31mFailed\e[0m"
