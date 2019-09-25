@@ -26,14 +26,26 @@ void StreamProcessingEngine::run() {
   inputMonitor = std::thread(&StreamProcessingEngine::launchInputs, this);
 
   // Schedule the operators where there is Data remaining
-  bool stillProcessing = false;
-  while (receivingInput || stillProcessing) {
-    stillProcessing = false;
-
+  bool dataInWorkflow = false;
+  bool receivedDataThisRound = false;
+  do {
+    // Try to execute each operator
     for (auto opPtr : ops) {
-      if (opPtr->execute() == true) stillProcessing = true;
+      opPtr->execute();
     }
-  }
+
+    receivedDataThisRound = receivingInput;
+    // If the inputs are done, look for leftover data in the workflow
+    if (!receivedDataThisRound) {
+      dataInWorkflow = false;
+      for (auto opPtr : ops) {
+        if (!opPtr->input.empty()) {
+          dataInWorkflow = true;
+          break;
+        }
+      }
+    }
+  } while (receivedDataThisRound || dataInWorkflow);
 
   // Clean up the inputMonitor thread
   inputMonitor.join();

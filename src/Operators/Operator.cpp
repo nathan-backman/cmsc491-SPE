@@ -1,7 +1,7 @@
 // Copyright 2019 [BVU CMSC491 class]
 #include "Operators/Operator.h"
 
-bool Operator::execute() {
+void Operator::execute() {
   // If the range is greater than 1, then it is an aggregate operator and uses
   // processData(vector<data>) rather than processData(Data)
   if (range > 1) {
@@ -10,7 +10,7 @@ bool Operator::execute() {
       inputMutex.lock();
       if (input.size() < range) {
         inputMutex.unlock();
-        return false;
+        return;
       }
 
       for (unsigned int i = 0; i < range; i++) {
@@ -23,7 +23,7 @@ bool Operator::execute() {
       inputMutex.lock();
       if (input.size() < slide) {
         inputMutex.unlock();
-        return false;
+        return;
       }
 
       // Remove data sliding out, add new data sliding in
@@ -36,7 +36,6 @@ bool Operator::execute() {
     }
 
     processData();
-    return true;
   } else {
     inputMutex.lock();
     if (input.empty() == false) {
@@ -45,11 +44,8 @@ bool Operator::execute() {
       inputMutex.unlock();
 
       processData(data);
-
-      return true;
     } else {
       inputMutex.unlock();
-      return false;
     }
   }
 }

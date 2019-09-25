@@ -43,12 +43,8 @@ class Operator : public Emitter {
    * This method retrieves a Data object from its `input` queue and passes it
    * on to the processData() method where a result Data object may or may not
    * be produced.
-   *
-   * @return A `bool` value denoting whether or not the operator successfully
-   * executed data. For example, the return value may be `false` if the
-   * operator's `input` queue was found to be empty with no data to process.
    */
-  bool execute();
+  void execute();
 
   /**
    * A user-defined, virtual function whose later implementation will dictate
