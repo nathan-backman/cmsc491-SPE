@@ -1,13 +1,14 @@
 // Copyright 2019 [BVU CMSC491 class]
 #include <iostream>
 #include <string>
+#include <any>
 #include <vector>
 #include "SPE.h"
 
 class NumberGenerator : public InputSource {
   void generateData() {
     for (int i = 1; i <= 1000000; i++) {
-      emit(Data(std::to_string(i)));
+      emit(Data(i));
     }
   }
 };
@@ -26,8 +27,8 @@ class IdentityOp : public Operator {
 class PrintData : public Operator {
  public:
   void processData(Data data) {
-    if (std::stoi(data.value) % 100000 == 0)
-      std::cout << data.value << std::endl;
+    if (std::any_cast<int>(data.value) % 100000 == 0)
+      std::cout << std::any_cast<int>(data.value) << std::endl;
   }
 };
 
