@@ -3,10 +3,9 @@
 #define OPERATORS_OPERATOR_H_
 
 #include <deque>
-#include <mutex>  // NOLINT
-#include <queue>
 #include "Data/Data.h"
 #include "Operators/Emitter.h"
+#include "Operators/Acceptor.h"
 
 /**
  * An abstract class that denotes the interconnectivity of user-defined
@@ -17,13 +16,16 @@
  * are meant to implement the processData() method which defines how the
  * user-defined operator intends to process data.
  */
-class Operator : public Emitter {
+template<typename A, typename B>
+class Operator : public Emitter<B> {
  public:
   /// The default constructor for an Operator that does not use a sliding
   /// window.
   Operator() {
     this->range = 1;
     this->slide = 1;
+
+    acceptor.executor = this;
   }
 
   /**
@@ -34,6 +36,8 @@ class Operator : public Emitter {
   explicit Operator(int range, int slide) {
     this->range = range;
     this->slide = slide;
+
+    acceptor = Acceptor<A>(this);
   }
 
   /**
@@ -83,22 +87,8 @@ class Operator : public Emitter {
    *   emit(outputData);
    * @endcode
    */
-  virtual void processData(Data data) {}
+  virtual void processData(Data<A> data) {}
   virtual void processData() {}
-
-  /**
-   * A wrapper around `input.push(data)` that protects the \ref input queue
-   * with a `std::mutex`.
-   *
-   * @param data The Data object to add to the \ref input queue
-   */
-  void addData(const Data &data);
-
-  /// Data waiting to be processed by the Operator
-  std::queue<Data> input;
-
-  /// Mutex protecting the \ref input queue
-  std::mutex inputMutex;
 
   /// The range of the window, defaults to 1 if not specified
   int range;
@@ -109,7 +99,9 @@ class Operator : public Emitter {
   /** The buffer for the window. It is loaded on the first
    * executed and updated each execute thereafter
    */
-  std::deque<Data> window;
+  std::deque<Data<A>> window;
+
+  Acceptor<A> acceptor;
 };
 
 #endif  // OPERATORS_OPERATOR_H_

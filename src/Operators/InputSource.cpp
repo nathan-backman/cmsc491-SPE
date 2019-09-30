@@ -1,8 +1,19 @@
 // Copyright 2019 [BVU CMSC491 class]
 #include "Operators/InputSource.h"
 
-void InputSource::startThread() {
-  inputThread = std::thread(&InputSource::generateData, this);
+template <typename T>
+InputSource<T>::InputSource() {
+  this->numItems = -1;
 }
 
-void InputSource::waitForCompletion() { inputThread.join(); }
+template <typename T>
+void InputSource<T>::execute() {
+}
+
+template <typename T>
+void InputSource<T>::startThread() {
+  inputThread = std::thread(&InputSource<T>::generateData, this);
+}
+
+template <typename T>
+void InputSource<T>::waitForCompletion() { inputThread.join(); }

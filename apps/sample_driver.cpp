@@ -4,9 +4,11 @@
 #include <vector>
 #include "SPE.h"
 
-class IncrementOp : public Operator {
+class IncrementOp : public Operator<std::string, std::string> {
  public:
-  void processData(Data data) {
+  IncrementOp() : Operator<std::string, std::string>() {}
+
+  void processData(Data<std::string> data) {
     int num = std::stoi(data.value);
     num++;
     num *= 10;
@@ -15,12 +17,17 @@ class IncrementOp : public Operator {
   }
 };
 
-class OutputOp : public Operator {
+class OutputOp : public Operator <std::string, std::string>{
  public:
-  void processData(Data data) { std::cout << data.value << std::endl; }
+  OutputOp() : Operator<std::string, std::string>() {}
+
+  void processData(Data<std::string> data) { std::cout << data.value << std::endl; }
 };
 
-class NumberGenerator : public InputSource {
+class NumberGenerator : public InputSource<std::string> {
+ public: 
+  NumberGenerator() : InputSource<std::string>() {} 
+
   void generateData() {
     for (int i = 1; i < 10; i += 2) {
       emit(Data(std::to_string(i)));
@@ -37,8 +44,8 @@ int main(int argc, char** argv) {
 
   StreamProcessingEngine spe;
 
-  spe.addInputSource(&inputSource, {&op1});
-  spe.connectOperators(&op1, {&op2});
+  spe.addInputSource<std::string>(&inputSource, {&op1.acceptor});
+  spe.connectOperators<std::string, std::string>(&op1, {&op2.acceptor});
 
   spe.run();
 

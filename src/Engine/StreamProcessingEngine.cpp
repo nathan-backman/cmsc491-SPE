@@ -1,19 +1,23 @@
 // Copyright 2019 [BVU CMSC491 class]
 #include "Engine/StreamProcessingEngine.h"
 
+template<typename A, typename B>
 void StreamProcessingEngine::connectOperators(
-    Operator* upstreamOp, std::vector<Operator*> downstreamOps) {
+    Operator<A,B>* upstreamOp, std::vector<Acceptor<B>*> downstreamOps) {
   // Register the downstream operators with the upstream operator
   upstreamOp->downstreamOperators = downstreamOps;
 
   // Add these operators to our running set of all workflow operators which
   // will be later used by the operator scheduler
   ops.insert(upstreamOp);
-  ops.insert(downstreamOps.begin(), downstreamOps.end());
+  for (auto a : downstreamOps) {
+    ops.insert(a->executor);
+  }
 }
 
+template<typename A>
 void StreamProcessingEngine::addInputSource(
-    InputSource* inputSource, std::vector<Operator*> downstreamOps) {
+    InputSource<A>* inputSource, std::vector<Acceptor<A>*> downstreamOps) {
   // Register the downstream operators with the upstream operator
   inputSource->downstreamOperators = downstreamOps;
 
@@ -39,7 +43,7 @@ void StreamProcessingEngine::run() {
     if (!receivedDataThisRound) {
       dataInWorkflow = false;
       for (auto opPtr : ops) {
-        if (!opPtr->input.empty()) {
+        if (opPtr->numItems != 0) {
           dataInWorkflow = true;
           break;
         }

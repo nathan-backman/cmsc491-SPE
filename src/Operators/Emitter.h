@@ -4,16 +4,17 @@
 
 #include <vector>
 #include "Data/Data.h"
-
-// Forward declartion since Operator includes Emitter
-class Operator;
+#include "Operators/Executor.h"
+#include "Operators/Acceptor.h"
 
 /**
  * Abstract class that provides functionality to Operator and InputSource
  * classes to \ref emit() Data to downstream <span>Operator</span>s.
  */
-class Emitter {
+template<typename T>
+class Emitter : public Executor {
  public:
+
   /**
    * Invoking this method allows the application programmer to produce data
    * from within the Operator::processData and InputSource::generateData
@@ -25,10 +26,10 @@ class Emitter {
    * @param data The Data object that the Operator produces as a result of
    * processing its input Data.
    */
-  void emit(const Data &data);
+  void emit(const Data<T> &data);
 
   /// A collection of pointers to downstream <span>Operator</span>s.
-  std::vector<Operator *> downstreamOperators;
+  std::vector<Acceptor<T>> downstreamOperators;
 };
 
 #endif  // OPERATORS_EMITTER_H_

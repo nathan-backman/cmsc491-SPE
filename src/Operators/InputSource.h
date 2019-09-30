@@ -13,8 +13,10 @@
  * threads that manage the lifetime of the InputSource. This works for both
  * batch/finite data as well as streaming/infinite data.
  */
-class InputSource : public Emitter {
+template<typename T>
+class InputSource : public Emitter<T> {
  public:
+   InputSource();
   /**
    * A user-defined, virtual function whose later implementation will dictate
    * what data an InputSource subclass will provide to the workflow.
@@ -40,6 +42,8 @@ class InputSource : public Emitter {
    * @endcode
    */
   virtual void generateData() = 0;
+
+  void execute();
 
   /// Launches the \ref inputThread that executes \ref generateData()
   void startThread();

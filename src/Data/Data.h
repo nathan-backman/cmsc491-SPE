@@ -15,6 +15,7 @@
  * stream and to let the application programmers make temporally-based
  * decisions.
  */
+template<typename T>
 class Data {
  public:
   /**
@@ -27,7 +28,7 @@ class Data {
    * @param value The string representation of the application programmer's
    * data.
    */
-  explicit Data(std::string value);
+  explicit Data(T value);
 
   /**
    * Creates Data from the users `value` and their provided `timestamp`.
@@ -42,10 +43,10 @@ class Data {
    * @param timestamp The unix timestamp that the application programmer wishes
    * to apply to the data as it enters the stream processing engine.
    */
-  Data(std::string value, timeval timestamp);
+  Data(T value, timeval timestamp);
 
   /// A string representation of the data
-  std::string value;
+  T value;
 
   /// The time the data entered the system
   timeval timestamp;

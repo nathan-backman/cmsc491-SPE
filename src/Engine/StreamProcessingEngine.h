@@ -8,6 +8,7 @@
 #include "Data/Data.h"
 #include "Operators/InputSource.h"
 #include "Operators/Operator.h"
+#include "Operators/Acceptor.h"
 
 /**
  * This class facilitates the execution of the stream processing environment.
@@ -33,8 +34,9 @@ class StreamProcessingEngine {
    * @param downstreamOps A vector of references to any immediate downstream
    * <span>Operator</span>s that are connected to the upstream Operator
    */
-  void connectOperators(Operator* upstreamOp,
-                        std::vector<Operator*> downstreamOps);
+  template<class A, class B>
+  void connectOperators(Operator<A, B>* upstreamOp,
+                        std::vector<Acceptor<B>*> downstreamOps);
 
   /**
    * Registers a connection between an InputSource and any downstream Operator
@@ -50,8 +52,9 @@ class StreamProcessingEngine {
    * @param downstreamOps A vector of references to any immediate downstream
    * <span>Operator</span>s that are connected to the InputSource
    */
-  void addInputSource(InputSource* inputSource,
-                      std::vector<Operator*> downstreamOps);
+  template<class A>
+  void addInputSource(InputSource<A>* inputSource,
+                      std::vector<Acceptor<A>*> downstreamOps);
 
   /**
    * Starts execution of the workflow.
@@ -71,10 +74,10 @@ class StreamProcessingEngine {
   void launchInputs();
 
   /// A collection of references to each Operator in the workflow
-  std::set<Operator*> ops;
+  std::set<Executor*> ops;
 
   /// A collection of references to each InputSource in the workflow
-  std::vector<InputSource*> inputSources;
+  std::vector<Executor*> inputSources;
 
   /// Thread that starts & joins the <span>InputSource</span> threads.
   std::thread inputMonitor;
