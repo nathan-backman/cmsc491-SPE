@@ -4,6 +4,8 @@
 
 #include <mutex>  // NOLINT
 #include <queue>
+#include "Data/Data.h"
+#include "Operators/Executor.h"
 
 template<typename T>
 class Acceptor {
