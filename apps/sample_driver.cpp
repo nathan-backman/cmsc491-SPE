@@ -1,5 +1,6 @@
 // Copyright 2019 [BVU CMSC491 class]
 #include <iostream>
+#include <any>
 #include <string>
 #include <vector>
 #include "SPE.h"
@@ -7,23 +8,25 @@
 class IncrementOp : public Operator {
  public:
   void processData(Data data) {
-    int num = std::stoi(data.value);
+    int num = std::any_cast<int>(data.value);
     num++;
     num *= 10;
-    data.value = std::to_string(num);
+    std::any a = num;
+    data.value = a;
     emit(data);
   }
 };
 
 class OutputOp : public Operator {
  public:
-  void processData(Data data) { std::cout << data.value << std::endl; }
+  void processData(Data data) { std::cout << std::any_cast<int>(data.value) << std::endl; }
 };
 
 class NumberGenerator : public InputSource {
   void generateData() {
     for (int i = 1; i < 10; i += 2) {
-      emit(Data(std::to_string(i)));
+      std::any a = i;
+      emit(Data(a));
     }
   }
 };
