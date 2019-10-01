@@ -7,7 +7,9 @@
 class NumberGenerator : public InputSource {
   void generateData() {
     for (int i = 1; i <= 1000000; i++) {
-      emit(Data(std::to_string(i)));
+      int *a = new int;
+      *a = i;
+      emit(Data(a));
     }
   }
 };
@@ -26,8 +28,10 @@ class IdentityOp : public Operator {
 class PrintData : public Operator {
  public:
   void processData(Data data) {
-    if (std::stoi(data.value) % 100000 == 0)
-      std::cout << data.value << std::endl;
+    int *intPtr = static_cast<int*>(data.value);
+    int num = *intPtr;
+    if (num % 100000 == 0)
+      std::cout << num << std::endl;
   }
 };
 

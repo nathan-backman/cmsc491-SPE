@@ -3,6 +3,7 @@
 #define DATA_DATA_H_
 
 #include <sys/time.h>
+#include <any>
 #include <string>
 
 /**
@@ -27,7 +28,7 @@ class Data {
    * @param value The string representation of the application programmer's
    * data.
    */
-  explicit Data(std::string value);
+  explicit Data(void* value);
 
   /**
    * Creates Data from the users `value` and their provided `timestamp`.
@@ -42,10 +43,10 @@ class Data {
    * @param timestamp The unix timestamp that the application programmer wishes
    * to apply to the data as it enters the stream processing engine.
    */
-  Data(std::string value, timeval timestamp);
+  Data(void* value, timeval timestamp);
 
   /// A string representation of the data
-  std::string value;
+  void* value;
 
   /// The time the data entered the system
   timeval timestamp;
