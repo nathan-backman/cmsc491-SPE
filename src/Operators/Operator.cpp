@@ -1,5 +1,7 @@
 // Copyright 2019 [BVU CMSC491 class]
 #include "Operators/Operator.h"
+#include <iostream>
+
 
 void Operator::execute() {
   // If the range is greater than 1, then it is an aggregate operator and uses

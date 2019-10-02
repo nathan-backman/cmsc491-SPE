@@ -2,28 +2,38 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <any>
 #include "SPE.h"
+
+struct NumberHolder {
+	int data;
+};
 
 class IncrementOp : public Operator {
  public:
   void processData(Data data) {
-    int num = std::stoi(data.value);
-    num++;
-    num *= 10;
-    data.value = std::to_string(num);
+	  int num = std::any_cast<int>(*data.value);
+	  num++;
+	  *data.value = num;
     emit(data);
   }
 };
 
 class OutputOp : public Operator {
  public:
-  void processData(Data data) { std::cout << data.value << std::endl; }
+  void processData(Data data) { 
+	  std::cout << std::any_cast<int>(*data.value) << std::endl; 
+	  //In this instance I delete in the output
+	  //However if a previous operator filtered it out they would have to delete it
+	  //Also deleting the *data.value didn't work even though the std::any was what I called new on. Compiler said to pass a pointer
+	  delete(data.value);
+  }
 };
 
 class NumberGenerator : public InputSource {
   void generateData() {
     for (int i = 1; i < 10; i += 2) {
-      emit(Data(std::to_string(i)));
+		emit(Data(i));
     }
   }
 };
