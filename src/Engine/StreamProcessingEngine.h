@@ -34,9 +34,6 @@ class StreamProcessingEngine {
    * @param downstreamOps A vector of references to any immediate downstream
    * <span>Operator</span>s that are connected to the upstream Operator
    */
-  //template<typename A, typename B>
-  //void connectOperators(Operator<A, B>* upstreamOp,
-  //                      std::vector<Acceptor<B>*> downstreamOps);
   template<typename A, typename B>
   void connectOperators(
       Operator<A,B>* upstreamOp, std::vector<Acceptor<B>*> downstreamOps) {
@@ -65,9 +62,6 @@ class StreamProcessingEngine {
    * @param downstreamOps A vector of references to any immediate downstream
    * <span>Operator</span>s that are connected to the InputSource
    */
-  //template<typename A>
-  //void addInputSource(InputSource<A>* inputSource,
-  //                    std::vector<Acceptor<A>*> downstreamOps);
   template<typename A>
     void addInputSource(
         InputSource<A>* inputSource, std::vector<Acceptor<A>*> downstreamOps) {

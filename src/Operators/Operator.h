@@ -41,15 +41,6 @@ class Operator : public Emitter<B> {
   }
 
   /**
-   * The operator scheduler invokes this method to have an operator process
-   * data.
-   *
-   * This method retrieves a Data object from its `input` queue and passes it
-   * on to the processData() method where a result Data object may or may not
-   * be produced.
-   */
-
-  /**
    * A user-defined, virtual function whose later implementation will dictate
    * how an Operator subclass is intended to process data.
    *

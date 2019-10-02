@@ -20,9 +20,6 @@ class InputSource : public Emitter<T> {
      this->numItems = -1;
    }
 
-  void execute() {
-  }
-
   void startThread() {
     inputThread = std::thread(&InputSource<T>::generateData, this);
   }
