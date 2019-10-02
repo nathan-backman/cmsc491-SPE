@@ -19,7 +19,7 @@ class NumberGenerator : public InputSource<int> {
 // 1) Receive data and emit the same data (the *identity* operator)
 class IdentityOp : public Operator<int, int> {
  public:
-  void processData(Data<int> data) { emit(Data<int>(data)); }
+  void processData(Data<int> data) {emit(Data<int>(data));}
 };
 
 // 4) Output (print) tuples
@@ -37,8 +37,8 @@ int main(int argc, char** argv) {
   PrintData op2;
 
   StreamProcessingEngine spe;
-  spe.addInputSource<int>(&inputSource, {&op1.acceptor});
-  spe.connectOperators<int>(&op1, {&op2.acceptor});
+  spe.addInputSource<int>(&inputSource, {&(op1.acceptor)});
+  spe.connectOperators<int>(&op1, {&(op2.acceptor)});
   spe.run();
 
   return 0;

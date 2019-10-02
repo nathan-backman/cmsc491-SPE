@@ -19,7 +19,7 @@ class NumberGenerator : public InputSource<int> {
 // 1) Receive data and emit the same data (the *identity* operator)
 class IdentityOp : public Operator<int, int> {
  public:
-  void processData(Data<int> data) {emit(Data<int>(data)); }
+  void processData(Data<int> data) {emit(Data<int>(data));}
 };
 
 // 4) Output (print) tuples
