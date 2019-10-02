@@ -28,7 +28,15 @@ class Data {
    * @param value The string representation of the application programmer's
    * data.
    */
-  explicit Data(T value);
+  Data(T value) {
+    this->value = value;
+    gettimeofday(&timestamp, NULL);  // Gets the current time
+  }
+
+  Data(T value, timeval timestamp) {
+    this->value = value;
+    this->timestamp = timestamp;  // Applies the provided timestamp
+  }
 
   /**
    * Creates Data from the users `value` and their provided `timestamp`.
@@ -43,7 +51,6 @@ class Data {
    * @param timestamp The unix timestamp that the application programmer wishes
    * to apply to the data as it enters the stream processing engine.
    */
-  Data(T value, timeval timestamp);
 
   /// A string representation of the data
   T value;

@@ -16,7 +16,18 @@
 template<typename T>
 class InputSource : public Emitter<T> {
  public:
-   InputSource();
+   InputSource() {
+     this->numItems = -1;
+   }
+
+  void execute() {
+  }
+
+  void startThread() {
+    inputThread = std::thread(&InputSource<T>::generateData, this);
+  }
+
+  void waitForCompletion() { inputThread.join(); }
   /**
    * A user-defined, virtual function whose later implementation will dictate
    * what data an InputSource subclass will provide to the workflow.
@@ -43,13 +54,10 @@ class InputSource : public Emitter<T> {
    */
   virtual void generateData() = 0;
 
-  void execute();
 
   /// Launches the \ref inputThread that executes \ref generateData()
-  void startThread();
 
   /// Calls `join()` on the \ref inputThread
-  void waitForCompletion();
 
  private:
   /// The `std::thread` which executes \ref generateData()

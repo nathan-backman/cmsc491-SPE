@@ -34,9 +34,22 @@ class StreamProcessingEngine {
    * @param downstreamOps A vector of references to any immediate downstream
    * <span>Operator</span>s that are connected to the upstream Operator
    */
-  template<class A, class B>
-  void connectOperators(Operator<A, B>* upstreamOp,
-                        std::vector<Acceptor<B>*> downstreamOps);
+  //template<typename A, typename B>
+  //void connectOperators(Operator<A, B>* upstreamOp,
+  //                      std::vector<Acceptor<B>*> downstreamOps);
+  template<typename A, typename B>
+  void connectOperators(
+      Operator<A,B>* upstreamOp, std::vector<Acceptor<B>*> downstreamOps) {
+    // Register the downstream operators with the upstream operator
+    upstreamOp->downstreamOperators = downstreamOps;
+
+    // Add these operators to our running set of all workflow operators which
+    // will be later used by the operator scheduler
+    ops.insert(upstreamOp);
+    for (auto a : downstreamOps) {
+      ops.insert(a->executor);
+    }
+  }
 
   /**
    * Registers a connection between an InputSource and any downstream Operator
@@ -52,9 +65,18 @@ class StreamProcessingEngine {
    * @param downstreamOps A vector of references to any immediate downstream
    * <span>Operator</span>s that are connected to the InputSource
    */
-  template<class A>
-  void addInputSource(InputSource<A>* inputSource,
-                      std::vector<Acceptor<A>*> downstreamOps);
+  //template<typename A>
+  //void addInputSource(InputSource<A>* inputSource,
+  //                    std::vector<Acceptor<A>*> downstreamOps);
+  template<typename A>
+    void addInputSource(
+        InputSource<A>* inputSource, std::vector<Acceptor<A>*> downstreamOps) {
+      // Register the downstream operators with the upstream operator
+      inputSource->downstreamOperators = downstreamOps;
+
+      // Register the inputSource with other input sources to be scheduled later
+      inputSources.push_back(inputSource);
+    }
 
   /**
    * Starts execution of the workflow.

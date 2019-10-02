@@ -1,6 +1,7 @@
 // Copyright 2019 [BVU CMSC491 class]
 #include "Engine/StreamProcessingEngine.h"
 
+/*
 template<typename A, typename B>
 void StreamProcessingEngine::connectOperators(
     Operator<A,B>* upstreamOp, std::vector<Acceptor<B>*> downstreamOps) {
@@ -14,7 +15,9 @@ void StreamProcessingEngine::connectOperators(
     ops.insert(a->executor);
   }
 }
+*/
 
+/*
 template<typename A>
 void StreamProcessingEngine::addInputSource(
     InputSource<A>* inputSource, std::vector<Acceptor<A>*> downstreamOps) {
@@ -24,6 +27,7 @@ void StreamProcessingEngine::addInputSource(
   // Register the inputSource with other input sources to be scheduled later
   inputSources.push_back(inputSource);
 }
+*/
 
 void StreamProcessingEngine::run() {
   // Launch all of the input threads

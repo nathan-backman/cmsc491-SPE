@@ -2,6 +2,7 @@
 #include "Operators/Emitter.h"
 #include "Operators/Operator.h"
 
+/*
 template<typename T>
 void Emitter<T>::emit(const Data<T> &data) {
   // Add the data to the input queues of each of the downstream operators
@@ -9,3 +10,4 @@ void Emitter<T>::emit(const Data<T> &data) {
     opPtr->addData(data);
   }
 }
+*/

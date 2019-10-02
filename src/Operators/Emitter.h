@@ -14,7 +14,12 @@
 template<typename T>
 class Emitter : public Executor {
  public:
-
+  void emit(const Data<T> &data) {
+  // Add the data to the input queues of each of the downstream operators
+    for (auto opPtr : downstreamOperators) {
+      opPtr->addData(data);
+    }
+  }
   /**
    * Invoking this method allows the application programmer to produce data
    * from within the Operator::processData and InputSource::generateData
@@ -26,10 +31,9 @@ class Emitter : public Executor {
    * @param data The Data object that the Operator produces as a result of
    * processing its input Data.
    */
-  void emit(const Data<T> &data);
 
   /// A collection of pointers to downstream <span>Operator</span>s.
-  std::vector<Acceptor<T>> downstreamOperators;
+  std::vector<Acceptor<T>*> downstreamOperators;
 };
 
 #endif  // OPERATORS_EMITTER_H_

@@ -30,7 +30,7 @@ class NumberGenerator : public InputSource<std::string> {
 
   void generateData() {
     for (int i = 1; i < 10; i += 2) {
-      emit(Data(std::to_string(i)));
+      emit(Data<std::string>(std::to_string(i)));
     }
   }
 };

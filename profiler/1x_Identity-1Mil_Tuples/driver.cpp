@@ -4,10 +4,10 @@
 #include <vector>
 #include "SPE.h"
 
-class NumberGenerator : public InputSource {
+class NumberGenerator : public InputSource<int> {
   void generateData() {
     for (int i = 1; i <= 1000000; i++) {
-      emit(Data(std::to_string(i)));
+      emit(Data<int>(i));
     }
   }
 };
@@ -17,16 +17,16 @@ class NumberGenerator : public InputSource {
 //  2) Output (print) tuples
 
 // 1) Receive data and emit the same data (the *identity* operator)
-class IdentityOp : public Operator {
+class IdentityOp : public Operator<int, int> {
  public:
-  void processData(Data data) { emit(data); }
+  void processData(Data<int> data) { emit(Data<int>(data)); }
 };
 
 // 4) Output (print) tuples
-class PrintData : public Operator {
+class PrintData : public Operator<int, int> {
  public:
-  void processData(Data data) {
-    if (std::stoi(data.value) % 100000 == 0)
+  void processData(Data<int> data) {
+    if (data.value % 100000 == 0)
       std::cout << data.value << std::endl;
   }
 };
@@ -37,8 +37,8 @@ int main(int argc, char** argv) {
   PrintData op2;
 
   StreamProcessingEngine spe;
-  spe.addInputSource(&inputSource, {&op1});
-  spe.connectOperators(&op1, {&op2});
+  spe.addInputSource<int>(&inputSource, {&op1.acceptor});
+  spe.connectOperators<int>(&op1, {&op2.acceptor});
   spe.run();
 
   return 0;

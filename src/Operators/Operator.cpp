@@ -1,7 +1,7 @@
 // Copyright 2019 [BVU CMSC491 class]
 #include "Operators/Operator.h"
 
-template<typename A, typename B>
+/*
 void Operator<A, B>::execute() {
   // If the range is greater than 1, then it is an aggregate operator and uses
   // processData(vector<data>) rather than processData(Data)
@@ -52,3 +52,4 @@ void Operator<A, B>::execute() {
     }
   }
 }
+*/
