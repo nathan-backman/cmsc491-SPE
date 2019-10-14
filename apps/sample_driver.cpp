@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
   spe.addInputSource(&inputSource, {&op1});
   spe.connectOperators(&op1, {&op2});
 
-  spe.run();
+  spe.run(2);
 
   std::cout << "SPE Finished." << std::endl;
   return 0;

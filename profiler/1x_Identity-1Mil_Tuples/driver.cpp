@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
   StreamProcessingEngine spe;
   spe.addInputSource(&inputSource, {&op1});
   spe.connectOperators(&op1, {&op2});
-  spe.run();
+  spe.run(4);
 
   return 0;
 }
