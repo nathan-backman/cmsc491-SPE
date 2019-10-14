@@ -7,23 +7,24 @@
 class IncrementOp : public Operator {
  public:
   void processData(Data data) {
-    int num = std::stoi(data.value);
+    int num = *(int*)data.value;
     num++;
     num *= 10;
-    data.value = std::to_string(num);
-    emit(data);
+
+    Data outputData(&num, sizeof(num), data.timestamp);
+    emit(outputData);
   }
 };
 
 class OutputOp : public Operator {
  public:
-  void processData(Data data) { std::cout << data.value << std::endl; }
+  void processData(Data data) { std::cout << *(int*)data.value << std::endl; }
 };
 
 class NumberGenerator : public InputSource {
   void generateData() {
     for (int i = 1; i < 10; i += 2) {
-      emit(Data(std::to_string(i)));
+      emit(Data(&i, sizeof(i)));
     }
   }
 };

@@ -4,6 +4,8 @@
 
 #include <sys/time.h>
 #include <string>
+#include <atomic>
+
 
 /**
  * The representation of data used by the stream processing engine.
@@ -27,7 +29,7 @@ class Data {
    * @param value The string representation of the application programmer's
    * data.
    */
-  explicit Data(std::string value);
+  explicit Data(void* value, uint32_t valueSize);
 
   /**
    * Creates Data from the users `value` and their provided `timestamp`.
@@ -42,13 +44,22 @@ class Data {
    * @param timestamp The unix timestamp that the application programmer wishes
    * to apply to the data as it enters the stream processing engine.
    */
-  Data(std::string value, timeval timestamp);
+  Data(void* value, uint32_t valueSize, timeval timestamp);
 
-  /// A string representation of the data
-  std::string value;
+  ~Data();
+
+  Data(const Data &old);
+
+  /// A pointer to the raw value data
+  void* value;
+
+  /// The size (in bytes) of the raw value data
+  uint32_t valueSize;
 
   /// The time the data entered the system
   timeval timestamp;
+
+  std::atomic<unsigned int> *refCount;
 };
 
 #endif  // DATA_DATA_H_
