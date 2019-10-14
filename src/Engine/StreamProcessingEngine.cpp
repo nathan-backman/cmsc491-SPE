@@ -21,10 +21,37 @@ void StreamProcessingEngine::addInputSource(
   inputSources.push_back(inputSource);
 }
 
-void StreamProcessingEngine::run() {
+void StreamProcessingEngine::run(int numThreads) {
   // Launch all of the input threads
   inputMonitor = std::thread(&StreamProcessingEngine::launchInputs, this);
 
+  // Create worker Threads
+  workerThreads = std::vector<std::thread>(numThreads);
+  for(int i=0; i<numThreads; i++) {
+    workerThreads[i] = std::thread(&StreamProcessingEngine::threadRunner, this);
+  }
+
+  // Clean up the inputMonitor thread
+  inputMonitor.join();
+
+  // Clean up workerThreads
+  for(int i=0; i<numThreads; i++) {
+    workerThreads[i].join();
+  }
+}
+
+void StreamProcessingEngine::launchInputs() {
+  // Launch threads
+  for (auto inputSource : inputSources) inputSource->startThread();
+
+  // Join threads
+  for (auto inputSource : inputSources) inputSource->waitForCompletion();
+
+  // Flag the operator execution code to signal that no more Data is coming
+  receivingInput = false;
+}
+
+void StreamProcessingEngine::threadRunner() {
   // Schedule the operators where there is Data remaining
   bool dataInWorkflow = false;
   bool receivedDataThisRound = false;
@@ -46,18 +73,4 @@ void StreamProcessingEngine::run() {
       }
     }
   } while (receivedDataThisRound || dataInWorkflow);
-
-  // Clean up the inputMonitor thread
-  inputMonitor.join();
-}
-
-void StreamProcessingEngine::launchInputs() {
-  // Launch threads
-  for (auto inputSource : inputSources) inputSource->startThread();
-
-  // Join threads
-  for (auto inputSource : inputSources) inputSource->waitForCompletion();
-
-  // Flag the operator execution code to signal that no more Data is coming
-  receivingInput = false;
 }
