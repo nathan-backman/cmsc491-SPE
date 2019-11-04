@@ -35,13 +35,24 @@ float calcDistance(pos playerPos, pos chunkPos) {
 }
 
 
-class ChunkProcessor : public Operator {
+class ChunkSelect : public Operator {
  public:
-  void processData(Data data) {
-  }
+   ChunkSelect(int r, int s) : Operator(r, s) {}
+   void processData(Data data) {}
+
+   void processData() {
+     aggData bestAgg = NULL;
+     for (Data d : window) {
+       if(bestAgg == NULL || bestAgg.chunkVal < (*(aggData*)d.value).chunkVal ) {
+         bestAgg = *(aggData*)d
+       }
+     }
+
+     emit(Data(bestAgg, sizeof(aggData) + (sizeof(pos) * bestAgg.oreLocations.capacity()) ));
+   }
 };
 
-class ChunkSelect : public Operator {
+class ChunkProcessor : public Operator {
  public:
   void processData(Data data) {
     chunkData chunk = *(chunkData*)data.value;
@@ -54,11 +65,10 @@ class ChunkSelect : public Operator {
         dataToPass.oreLocations.push_back(b.p);
       }
     }
-    //TODO calculate distance from player to chunk
-    //TODO set chunkVal and emit
+
     dataToPass.chunkVal = count/calcDistance(chunk.playerPos, chunk.chunk[0].p);
-    //FIXME wtf is size??
-    emit(dataToPass, sizeof(aggData));
+
+    emit(Data(dataToPass, sizeof(aggData) + (sizeof(pos) * dataToPass.oreLocations.capacity()) ));
   }
 };
 
@@ -68,6 +78,9 @@ class Generator : public InputSource {
   }
 };
 
+//TODO pritn data
+
+//TODO
 int main(int argc, char** argv) {
   std::cout << "SPE Starting up." << std::endl;
 
