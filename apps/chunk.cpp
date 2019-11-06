@@ -34,6 +34,13 @@ float calcDistance(pos playerPos, pos chunkPos) {
   return dist;
 }
 
+pos getBlockPos(int i, pos globalChunkPos) {
+  //TODO
+  //need to find the global position for a block given its index within a chunk
+  //i = y*16*16 + z*16 + x
+  //fuck
+}
+
 
 class ChunkSelect : public Operator {
  public:
@@ -72,7 +79,7 @@ class ChunkProcessor : public Operator {
   }
 };
 
-//TODO
+//TODO may or may not be our job to do this
 class Generator : public InputSource {
   void generateData() {
   }
