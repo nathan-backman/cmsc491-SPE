@@ -9,13 +9,15 @@ struct pos {
   int x, y, z;
 } typedef pos;
 
+/*
 struct block {
   int id;
   pos p;
 } typedef block;
+*/
 
 struct chunkData {
-  vector<block> chunk;
+  vector<int> chunk;
   int oreID;
   pos playerPos;
 } typedef chunkData;
@@ -35,13 +37,17 @@ float calcDistance(pos playerPos, pos chunkPos) {
 }
 
 pos getBlockPos(int i, pos globalChunkPos) {
-  //TODO
-  //need to find the global position for a block given its index within a chunk
   //i = y*16*16 + z*16 + x
-  //fuck
+  pos p;
+  p.y = i/256 + globalChunkPos.y;
+  p.z = (i-(p.y*256))/16 + globalChunkPos.z;
+  p.x = (i-(p.y*256)-(p.z*16))+ globalChunkPos.x;
+
+  return p;
 }
 
 
+//FIXME refactor
 class ChunkSelect : public Operator {
  public:
    ChunkSelect(int r, int s) : Operator(r, s) {}
@@ -59,6 +65,7 @@ class ChunkSelect : public Operator {
    }
 };
 
+//FIXME refactor
 class ChunkProcessor : public Operator {
  public:
   void processData(Data data) {
@@ -67,7 +74,7 @@ class ChunkProcessor : public Operator {
     aggData dataToPass;
     dataToPass.chunkID = chunk.chunk[0];
     for(auto b : chunk.chunk) {
-      if(b.id == chunk.oreID) {
+      if(b == chunk.oreID) {
         count++;
         dataToPass.oreLocations.push_back(b.p);
       }
