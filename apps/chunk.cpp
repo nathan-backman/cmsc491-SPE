@@ -9,24 +9,21 @@ struct pos {
   int x, y, z;
 } typedef pos;
 
-/*
-struct block {
-  int id;
-  pos p;
-} typedef block;
-*/
 
 struct chunkData {
-  vector<int> chunk;
   int oreID;
   pos playerPos;
+  pos globalChunkPos;
+  int chunk[65536];
 } typedef chunkData;
 
+
 struct assData {
-  int chunkID;
   float chunkVal;
-  vector<pos> oreLocations;
+  pos chunkID;
+  vector<pos>* oreLocations;
 } typedef aggData;
+
 
 float calcDistance(pos playerPos, pos chunkPos) {
   float x = pow(playerPos.x - chunkPos.x, 2);
@@ -35,6 +32,7 @@ float calcDistance(pos playerPos, pos chunkPos) {
   float dist = sqrt(x+y+z);
   return dist;
 }
+
 
 pos getBlockPos(int i, pos globalChunkPos) {
   //i = y*16*16 + z*16 + x
@@ -47,7 +45,6 @@ pos getBlockPos(int i, pos globalChunkPos) {
 }
 
 
-//FIXME refactor
 class ChunkSelect : public Operator {
  public:
    ChunkSelect(int r, int s) : Operator(r, s) {}
@@ -57,34 +54,43 @@ class ChunkSelect : public Operator {
      aggData bestAgg = NULL;
      for (Data d : window) {
        if(bestAgg == NULL || bestAgg.chunkVal < (*(aggData*)d.value).chunkVal ) {
-         bestAgg = *(aggData*)d
+         if(bestAgg != NULL) {
+           delete bestAgg.oreLocations;
+         }
+         bestAgg = *(aggData*)d;
+       }
+       else {
+         delete (*(aggData*)d.value).oreLocations
        }
      }
 
-     emit(Data(bestAgg, sizeof(aggData) + (sizeof(pos) * bestAgg.oreLocations.capacity()) ));
+     emit(Data(bestAgg, sizeof(aggData)));
    }
 };
 
-//FIXME refactor
+
 class ChunkProcessor : public Operator {
  public:
   void processData(Data data) {
     chunkData chunk = *(chunkData*)data.value;
     float count = 0;
     aggData dataToPass;
-    dataToPass.chunkID = chunk.chunk[0];
-    for(auto b : chunk.chunk) {
-      if(b == chunk.oreID) {
+    vector<pos> oreLocations = new vector<pos>;
+    dataToPass.chunkID = chunk.globalChunkPosition;
+    dataToPass.oreLocations = &oreLocations;
+    for(int i = 0; i<65536 ; i++) {
+      if(chunk.chunk[i] == chunk.oreID) {
         count++;
-        dataToPass.oreLocations.push_back(b.p);
+        oreLocations.push_back(getBlockPos(i, chunk.globalChunkPos));
       }
     }
 
-    dataToPass.chunkVal = count/calcDistance(chunk.playerPos, chunk.chunk[0].p);
+    dataToPass.chunkVal = count/calcDistance(chunk.playerPos, chunk.globalChunkPos);
 
-    emit(Data(dataToPass, sizeof(aggData) + (sizeof(pos) * dataToPass.oreLocations.capacity()) ));
+    emit(Data(dataToPass, sizeof(aggData)));
   }
 };
+
 
 //TODO may or may not be our job to do this
 class Generator : public InputSource {
@@ -92,15 +98,15 @@ class Generator : public InputSource {
   }
 };
 
-//TODO pritn data
 
+//TODO pritn data
 //TODO
 int main(int argc, char** argv) {
   std::cout << "SPE Starting up." << std::endl;
 
-  NumberGenerator inputSource;
-  IncrementOp op1;
-  OutputOp op2;
+  Generator inputSource;
+  ChunkProcessor op1;
+  ChunkSelect op2;
 
   StreamProcessingEngine spe;
 
