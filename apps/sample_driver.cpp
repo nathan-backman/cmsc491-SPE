@@ -10,6 +10,7 @@ struct pos {
 } typedef pos;
 
 
+//TODO make int[] into unsigned 8byte int[] (uint8_t)
 struct chunkData {
   int oreID;
   pos playerPos;
