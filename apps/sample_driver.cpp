@@ -37,9 +37,16 @@ float calcDistance(pos playerPos, pos chunkPos) {
 pos getBlockPos(int i, pos globalChunkPos) {
   //i = y*16*16 + z*16 + x
   pos p;
-  p.y = i/256 + globalChunkPos.y;
-  p.z = (i-(p.y*256))/16 + globalChunkPos.z;
-  p.x = (i-(p.y*256)-(p.z*16))+ globalChunkPos.x;
+  int relx, rely, relz, diff;
+
+  rely = i/256;
+  diff = i-(rely*256);
+  relx = diff % 16;
+  relz = (diff - relx)/16;
+
+  p.y = rely+ globalChunkPos.y;
+  p.z = relz+ globalChunkPos.z;
+  p.x = relx+ globalChunkPos.x;
 
   return p;
 }
@@ -127,7 +134,7 @@ class PrintOp : public Operator{
         aggData bestChunk = *(aggData*)data.value;
         std::vector<pos> ores = *(bestChunk.oreLocations);
         for(int i=0; i<ores.size(); i++){
-          std::cout <<"Best Chunk: " << bestChunk.chunkID.x << bestChunk.chunkID.z << bestChunk.chunkID.y << std::endl;
+          std::cout <<"Chunk: " << bestChunk.chunkID.x << " " << bestChunk.chunkID.z << " " << bestChunk.chunkID.y << std::endl;
           std::cout <<"Good shit at pos:" << std::endl;
           std::cout << "x: " << ores[i].x << std::endl;
           std::cout << "z: " << ores[i].z << std::endl;
