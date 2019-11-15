@@ -45,9 +45,9 @@ pos getBlockPos(int i, pos globalChunkPos) {
   relx = diff % 16;
   relz = (diff - relx)/16;
 
-  p.y = rely+ globalChunkPos.y;
-  p.z = relz+ globalChunkPos.z;
-  p.x = relx+ globalChunkPos.x;
+  p.y = rely + globalChunkPos.y;
+  p.z = relz + globalChunkPos.z;
+  p.x = relx + globalChunkPos.x;
 
   return p;
 }
@@ -103,18 +103,19 @@ class ChunkProcessor : public Operator {
 
 class Generator : public InputSource {
   void generateData() {
+    // Uncomment commented lines to get a file with the input data
     //open a handle to file 
-    std::ofstream out;
-    out.open("dataInput.data");
+    //std::ofstream out;
+    //out.open("dataInput.data");
 
     pos playerPos;
     playerPos.x = 50;
     playerPos.y = 123;
     playerPos.z = 163;
 
-    out << playerPos.x << " ";
-    out << playerPos.z << " ";
-    out << playerPos.y << std::endl;
+    //out << playerPos.x << " ";
+    //out << playerPos.z << " ";
+    //out << playerPos.y << std::endl;
     
     for(int i=0; i<3; i++){
       chunkData data;
@@ -124,14 +125,20 @@ class Generator : public InputSource {
       data.globalChunkPos.z = rand()%512;
       data.globalChunkPos.y = 0;
 
+      //out << data.globalChunkPos.x << " ";
+      //out << data.globalChunkPos.z << " ";
+      //out << data.globalChunkPos.y << std::endl;
+
       for(int j=0; j<65536; j++){
-        data.chunk[j] = (uint8_t)rand()%65;
+        int randNum = rand()%65;
+        //out << randNum << std::endl;
+        data.chunk[j] = (uint8_t)randNum;
       }
       
       emit(Data(&data, sizeof(chunkData)));
     }
 
-    out.close();
+    //out.close();
   }
 };
 
