@@ -5,6 +5,7 @@
 #include <vector>
 #include <cmath>
 #include "SPE.h"
+#include "TCPListener.h"
 
 struct pos {
   int x, y, z;
@@ -16,7 +17,7 @@ struct chunkData {
   pos playerPos;
   pos globalChunkPos;
   uint8_t chunk[65536];
-} typedef chunkData;
+} __attribute__((packed)) typedef chunkData;
 
 
 struct assData {
@@ -103,6 +104,37 @@ class ChunkProcessor : public Operator {
 
 class Generator : public InputSource {
   void generateData() {
+
+    TCPListener listener;
+    listener.Bind(12345);
+    std::cout << "Waiting for connections on 12345..." << std::endl;
+    while ( listener.WaitForConnection() ) {
+      std::cout << "Connection received." << std::endl;
+
+      // uint8_t oreID;
+      // pos playerPos;
+      // pos globalChunkPos;
+
+      chunkData recvData;
+      listener.GetData((char*)&recvData, sizeof(recvData));
+      std::cout << "oreID: " << (int)recvData.oreID << std::endl;
+      std::cout << "playerPos.x: " << recvData.playerPos.x << std::endl;
+      std::cout << "playerPos.y: " << recvData.playerPos.y << std::endl;
+      std::cout << "playerPos.z: " << recvData.playerPos.z << std::endl;
+      std::cout << "globalChunkPos.x: " << recvData.globalChunkPos.x << std::endl;
+      std::cout << "globalChunkPos.y: " << recvData.globalChunkPos.y << std::endl;
+      std::cout << "globalChunkPos.z: " << recvData.globalChunkPos.z << std::endl;
+      std::cout << "chunk[0]: " << (int)recvData.chunk[0] << std::endl;
+      std::cout << "chunk[1]: " << (int)recvData.chunk[1] << std::endl;
+      std::cout << "chunk[2]: " << (int)recvData.chunk[2] << std::endl;
+
+      std::cout << "Waiting for connections on 12345..." << std::endl;
+    }
+
+    exit(0);
+
+
+
     // Uncomment commented lines to get a file with the input data
     //open a handle to file 
     //std::ofstream out;
