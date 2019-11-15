@@ -1,5 +1,6 @@
 // Copyright 2019 [BVU CMSC491 class]
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <cmath>
@@ -10,12 +11,11 @@ struct pos {
 } typedef pos;
 
 
-//TODO make int[] into unsigned 8byte int[] (uint8_t)
 struct chunkData {
-  int oreID;
+  uint8_t oreID;
   pos playerPos;
   pos globalChunkPos;
-  int chunk[65536];
+  uint8_t chunk[65536];
 } typedef chunkData;
 
 
@@ -54,77 +54,84 @@ pos getBlockPos(int i, pos globalChunkPos) {
 
 
 class ChunkSelect : public Operator {
- public:
-   ChunkSelect(int r, int s) : Operator(r, s) {}
-   void processData(Data data) {}
+  public:
+    ChunkSelect(int r, int s) : Operator(r, s) {}
+    void processData(Data data) {}
 
-   void processData() {
-     aggData bestAgg;
-     bestAgg.chunkVal = -1;
-     for (Data d : window) {
-       if(bestAgg.chunkVal == -1 || bestAgg.chunkVal < (*(aggData*)d.value).chunkVal ) {
-         if(bestAgg.chunkVal != -1) {
-           delete bestAgg.oreLocations;
-         }
-         bestAgg = *(aggData*)(d.value);
-       }
-       else {
-         delete (*(aggData*)d.value).oreLocations;
-       }
-     }
+    void processData() {
+      aggData bestAgg;
+      bestAgg.chunkVal = -1;
+      for (Data d : window) {
+        if(bestAgg.chunkVal == -1 || bestAgg.chunkVal < (*(aggData*)d.value).chunkVal ) {
+          if(bestAgg.chunkVal != -1) {
+            delete bestAgg.oreLocations;
+          }
+          bestAgg = *(aggData*)(d.value);
+        }
+        else {
+          delete (*(aggData*)d.value).oreLocations;
+        }
+      }
 
-     emit(Data(&bestAgg, sizeof(aggData)));
-   }
+      emit(Data(&bestAgg, sizeof(aggData)));
+    }
 };
 
 
 class ChunkProcessor : public Operator {
- public:
-  void processData(Data data) {
-    chunkData chunk = *(chunkData*)data.value;
-    float count = 0;
-    aggData dataToPass;
-    std::vector<pos>* oreLocations = new std::vector<pos>;
-    dataToPass.chunkID = chunk.globalChunkPos;
-    dataToPass.oreLocations = oreLocations;
-    for(int i = 0; i<65536 ; i++) {
-      if(chunk.chunk[i] == chunk.oreID) {
-        count++;
-        oreLocations->push_back(getBlockPos(i, chunk.globalChunkPos));
+  public:
+    void processData(Data data) {
+      chunkData chunk = *(chunkData*)data.value;
+      float count = 0;
+      aggData dataToPass;
+      std::vector<pos>* oreLocations = new std::vector<pos>;
+      dataToPass.chunkID = chunk.globalChunkPos;
+      dataToPass.oreLocations = oreLocations;
+      for(int i = 0; i<65536 ; i++) {
+        if(chunk.chunk[i] == chunk.oreID){
+          count++;
+          oreLocations->push_back(getBlockPos(i, chunk.globalChunkPos));
+        }
       }
+
+      dataToPass.chunkVal = count/calcDistance(chunk.playerPos, chunk.globalChunkPos);
+
+      emit(Data(&dataToPass, sizeof(aggData)));
     }
-
-    dataToPass.chunkVal = count/calcDistance(chunk.playerPos, chunk.globalChunkPos);
-
-    emit(Data(&dataToPass, sizeof(aggData)));
-  }
 };
 
 
 class Generator : public InputSource {
   void generateData() {
-    pos playerPos;
-    // take in player pos
-    std::cin >> playerPos.x;
-    std::cin >> playerPos.z;
-    std::cin >> playerPos.y;
+    //open a handle to file 
+    std::ofstream out;
+    out.open("dataInput.data");
 
-    for(int i=0; i<3; i++) {
-      // take in chunk global position
+    pos playerPos;
+    playerPos.x = 50;
+    playerPos.y = 123;
+    playerPos.z = 163;
+
+    out << playerPos.x << " ";
+    out << playerPos.z << " ";
+    out << playerPos.y << std::endl;
+    
+    for(int i=0; i<3; i++){
       chunkData data;
       data.playerPos = playerPos;
       data.oreID = 5;
-      std::cin >> data.globalChunkPos.x;
-      std::cin >> data.globalChunkPos.z;
-      std::cin >> data.globalChunkPos.y;
+      data.globalChunkPos.x = rand()%512;
+      data.globalChunkPos.z = rand()%512;
+      data.globalChunkPos.y = 0;
 
-      for(int j=0; j<65536; j++) {
-        //take in ids
-        std::cin >> data.chunk[j];
+      for(int j=0; j<65536; j++){
+        data.chunk[j] = (uint8_t)rand()%65;
       }
-
+      
       emit(Data(&data, sizeof(chunkData)));
     }
+
+    out.close();
   }
 };
 
@@ -132,16 +139,16 @@ class Generator : public InputSource {
 class PrintOp : public Operator{
   public:
     void processData(Data data){
-        aggData bestChunk = *(aggData*)data.value;
-        std::vector<pos> ores = *(bestChunk.oreLocations);
-        for(int i=0; i<ores.size(); i++){
-          std::cout <<"Chunk: " << bestChunk.chunkID.x << " " << bestChunk.chunkID.z << " " << bestChunk.chunkID.y << std::endl;
-          std::cout <<"Good shit at pos:" << std::endl;
-          std::cout << "x: " << ores[i].x << std::endl;
-          std::cout << "z: " << ores[i].z << std::endl;
-          std::cout << "y: " << ores[i].y << std::endl;
-        }
-        delete bestChunk.oreLocations;
+      aggData bestChunk = *(aggData*)data.value;
+      std::vector<pos> ores = *(bestChunk.oreLocations);
+      for(int i=0; i<ores.size(); i++){
+       std::cout <<"Chunk: " << bestChunk.chunkID.x << " " << bestChunk.chunkID.z << " " << bestChunk.chunkID.y << std::endl;
+       std::cout <<"Good shit at pos:" << std::endl;
+       std::cout << "x: " << ores[i].x << std::endl;
+       std::cout << "z: " << ores[i].z << std::endl;
+       std::cout << "y: " << ores[i].y << std::endl;
+      }
+      delete bestChunk.oreLocations;
     }
 };
 
