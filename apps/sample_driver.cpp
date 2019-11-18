@@ -57,9 +57,14 @@ pos getBlockPos(int i, pos globalChunkPos) {
 class ChunkSelect : public Operator {
   public:
     ChunkSelect(int r, int s) : Operator(r, s) {}
-    void processData(Data data) {}
+    void processData(Data data) {
+      std::cout << "chunk select recv one data" << std::endl;
+      emit(Data(&data, sizeof(aggData)));
+      std::cout << "chunk select emit data" << std::endl;
+    }
 
     void processData() {
+      std::cout << "chunk select recv data" << std::endl;
       aggData bestAgg;
       bestAgg.chunkVal = -1;
       for (Data d : window) {
@@ -74,6 +79,7 @@ class ChunkSelect : public Operator {
         }
       }
 
+      std::cout << "chunk select emit data" << std::endl;
       emit(Data(&bestAgg, sizeof(aggData)));
     }
 };
@@ -82,6 +88,7 @@ class ChunkSelect : public Operator {
 class ChunkProcessor : public Operator {
   public:
     void processData(Data data) {
+      std::cout << "chunk procesessor recv data" << std::endl;
       chunkData chunk = *(chunkData*)data.value;
       float count = 0;
       aggData dataToPass;
@@ -97,6 +104,7 @@ class ChunkProcessor : public Operator {
 
       dataToPass.chunkVal = count/calcDistance(chunk.playerPos, chunk.globalChunkPos);
 
+      std::cout << "chunk procesessor emit data" << std::endl;
       emit(Data(&dataToPass, sizeof(aggData)));
     }
 };
@@ -111,10 +119,6 @@ class Generator : public InputSource {
     while ( listener.WaitForConnection() ) {
       std::cout << "Connection received." << std::endl;
 
-      // uint8_t oreID;
-      // pos playerPos;
-      // pos globalChunkPos;
-
       chunkData recvData;
       listener.GetData((char*)&recvData, sizeof(recvData));
       std::cout << "oreID: " << (int)recvData.oreID << std::endl;
@@ -124,53 +128,16 @@ class Generator : public InputSource {
       std::cout << "globalChunkPos.x: " << recvData.globalChunkPos.x << std::endl;
       std::cout << "globalChunkPos.y: " << recvData.globalChunkPos.y << std::endl;
       std::cout << "globalChunkPos.z: " << recvData.globalChunkPos.z << std::endl;
-      std::cout << "chunk[0]: " << (int)recvData.chunk[0] << std::endl;
-      std::cout << "chunk[1]: " << (int)recvData.chunk[1] << std::endl;
-      std::cout << "chunk[2]: " << (int)recvData.chunk[2] << std::endl;
+      //std::cout << "chunk[0]: " << (int)recvData.chunk[0] << std::endl;
+      //std::cout << "chunk[1]: " << (int)recvData.chunk[1] << std::endl;
+      //std::cout << "chunk[2]: " << (int)recvData.chunk[2] << std::endl;
 
+      recvData.oreID = 25;
+
+      emit(Data(&recvData, sizeof(chunkData)));
       std::cout << "Waiting for connections on 12345..." << std::endl;
     }
-
-    exit(0);
-
-
-
-    // Uncomment commented lines to get a file with the input data
-    //open a handle to file 
-    //std::ofstream out;
-    //out.open("dataInput.data");
-
-    pos playerPos;
-    playerPos.x = 50;
-    playerPos.y = 123;
-    playerPos.z = 163;
-
-    //out << playerPos.x << " ";
-    //out << playerPos.z << " ";
-    //out << playerPos.y << std::endl;
-    
-    for(int i=0; i<3; i++){
-      chunkData data;
-      data.playerPos = playerPos;
-      data.oreID = 5;
-      data.globalChunkPos.x = rand()%512;
-      data.globalChunkPos.z = rand()%512;
-      data.globalChunkPos.y = 0;
-
-      //out << data.globalChunkPos.x << " ";
-      //out << data.globalChunkPos.z << " ";
-      //out << data.globalChunkPos.y << std::endl;
-
-      for(int j=0; j<65536; j++){
-        int randNum = rand()%65;
-        //out << randNum << std::endl;
-        data.chunk[j] = (uint8_t)randNum;
-      }
       
-      emit(Data(&data, sizeof(chunkData)));
-    }
-
-    //out.close();
   }
 };
 
@@ -178,8 +145,10 @@ class Generator : public InputSource {
 class PrintOp : public Operator{
   public:
     void processData(Data data){
+      std::cout << "chunk print recv data" << std::endl;
       aggData bestChunk = *(aggData*)data.value;
       std::vector<pos> ores = *(bestChunk.oreLocations);
+      std::cout << "ores size: " << ores.size() << std::endl;
       for(int i=0; i<ores.size(); i++){
        std::cout <<"Chunk: " << bestChunk.chunkID.x << " " << bestChunk.chunkID.z << " " << bestChunk.chunkID.y << std::endl;
        std::cout <<"Good shit at pos:" << std::endl;
@@ -196,14 +165,14 @@ int main(int argc, char** argv) {
 
   Generator inputSource;
   ChunkProcessor op1;
-  ChunkSelect op2(3, 3);
+  ChunkSelect op2(1, 1);
   PrintOp op3;
 
   StreamProcessingEngine spe;
 
   spe.addInputSource(&inputSource, {&op1});
-  spe.connectOperators(&op1, {&op2});
-  spe.connectOperators(&op2, {&op3});
+  //spe.connectOperators(&op1, {&op2});
+  spe.connectOperators(&op1, {&op3});
 
   spe.run();
 
