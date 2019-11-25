@@ -116,11 +116,13 @@ class Generator : public InputSource {
     TCPListener listener;
     listener.Bind(12345);
     std::cout << "Waiting for connections on 12345..." << std::endl;
-    while ( listener.WaitForConnection() ) {
+    std::cout << "RecvData size: " << sizeof(chunkData) << std::endl;
+
+    listener.WaitForConnection();
+    chunkData recvData;
+    while ( listener.GetData((char*)&recvData, sizeof(recvData)) ) {
       std::cout << "Connection received." << std::endl;
 
-      chunkData recvData;
-      listener.GetData((char*)&recvData, sizeof(recvData));
       std::cout << "oreID: " << (int)recvData.oreID << std::endl;
       std::cout << "playerPos.x: " << recvData.playerPos.x << std::endl;
       std::cout << "playerPos.y: " << recvData.playerPos.y << std::endl;
@@ -132,8 +134,12 @@ class Generator : public InputSource {
       //std::cout << "chunk[1]: " << (int)recvData.chunk[1] << std::endl;
       //std::cout << "chunk[2]: " << (int)recvData.chunk[2] << std::endl;
 
-      recvData.oreID = 25;
+      recvData.oreID = 26;
 
+      //std::cout << "10 64 7: " << (int)recvData.chunk[16762-256] << std::endl;
+      //std::cout << "10 65 7: " << (int)recvData.chunk[16762] << std::endl;
+      //std::cout << "10 66 7: " << (int)recvData.chunk[16762+256] << std::endl;
+      //std::cout << "10 67 7: " << (int)recvData.chunk[16762+512] << std::endl;
       emit(Data(&recvData, sizeof(chunkData)));
       std::cout << "Waiting for connections on 12345..." << std::endl;
     }
