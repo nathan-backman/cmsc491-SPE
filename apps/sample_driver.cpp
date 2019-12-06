@@ -159,8 +159,17 @@ class PrintOp : public Operator{
        std::cout << "z: " << ores[i].z << std::endl;
        std::cout << "y: " << ores[i].y << std::endl;
       }
-      /*
-      */
+
+      if (ores.empty() == false) {
+        std::ostringstream os;
+        os << "Get ore at " << ores[0].x << " " << ores[0].y << " " << ores[0].z;
+        string msg = os.str();
+        uint8_t msgSz = msg.size();
+
+        listener.SendData((char*)&msgSz, sizeof(msgSz));
+        listener.SendData(msg.c_str(), msgSz);
+      }
+
       delete bestChunk.oreLocations;
     }
 };
