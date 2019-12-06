@@ -59,8 +59,8 @@ class MinecraftRegionLoader {
     regionX = (playerPos.x / 16) / 32;
     regionZ = (playerPos.z / 16) / 32;
 
-    char regionFileName[64];
-    sprintf(regionFileName, "r.%d.%d.mca", regionX, regionZ);
+    char regionFileName[128];
+    sprintf(regionFileName, "/home/student/Desktop/server/world/region/r.%d.%d.mca", regionX, regionZ);
     std::cout << "Reading region file [" << regionFileName << "]" << std::endl;
 
     // attempt to open file
