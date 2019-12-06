@@ -1,24 +1,16 @@
 // Copyright 2019 [BVU CMSC491 class]
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <cmath>
 #include "SPE.h"
 #include "TCPListener.h"
-
-struct pos {
-  int x, y, z;
-} typedef pos;
+#include "MinecraftRegionLoader.h"
 
 
-struct chunkData {
-  uint8_t oreID;
-  pos playerPos;
-  pos globalChunkPos;
-  uint8_t chunk[65536];
-} __attribute__((packed)) typedef chunkData;
-
+TCPListener listener;
 
 struct assData {
   float chunkVal;
@@ -88,12 +80,26 @@ class ChunkSelect : public Operator {
 class ChunkProcessor : public Operator {
   public:
     void processData(Data data) {
-      std::cout << "chunk procesessor recv data" << std::endl;
-      chunkData chunk = *(chunkData*)data.value;
+      //std::cout << "chunk procesessor recv data" << std::endl;
+      ChunkData &chunk = *(ChunkData*)data.value;
+
+      // Handle an empty chunk
+      if (chunk.empty == true) {
+        aggData dataToPass;
+        dataToPass.oreLocations = new std::vector<pos>;
+        dataToPass.chunkVal = 0;
+         
+        //std::cout << "[empty] chunk procesessor emit data" << std::endl;
+        emit(Data(&dataToPass, sizeof(aggData)));
+        return;
+      }
+
+      // Handle an non-empty chunk
       float count = 0;
       aggData dataToPass;
       std::vector<pos>* oreLocations = new std::vector<pos>;
       dataToPass.chunkID = chunk.globalChunkPos;
+
       dataToPass.oreLocations = oreLocations;
       for(int i = 0; i<65536 ; i++) {
         if(chunk.chunk[i] == chunk.oreID){
@@ -104,7 +110,7 @@ class ChunkProcessor : public Operator {
 
       dataToPass.chunkVal = count/calcDistance(chunk.playerPos, chunk.globalChunkPos);
 
-      std::cout << "chunk procesessor emit data" << std::endl;
+      std::cout << "[non-empty] chunk procesessor emit data with #ores:" << oreLocations->size() << std::endl;
       emit(Data(&dataToPass, sizeof(aggData)));
     }
 };
@@ -113,37 +119,27 @@ class ChunkProcessor : public Operator {
 class Generator : public InputSource {
   void generateData() {
 
-    TCPListener listener;
-    listener.Bind(12345);
-    std::cout << "Waiting for connections on 12345..." << std::endl;
-    std::cout << "RecvData size: " << sizeof(chunkData) << std::endl;
+    std::cout << "Waiting for data from mod..." << std::endl;
 
-    listener.WaitForConnection();
-    chunkData recvData;
-    while ( listener.GetData((char*)&recvData, sizeof(recvData)) ) {
-      std::cout << "Connection received." << std::endl;
+    std::string strPos;
+    while ( (strPos = listener.GetLine()) != "") {
+      std::istringstream is(strPos);
+      pos playerPos;
+      is >> playerPos.x >> playerPos.y >> playerPos.z;
 
-      std::cout << "oreID: " << (int)recvData.oreID << std::endl;
-      std::cout << "playerPos.x: " << recvData.playerPos.x << std::endl;
-      std::cout << "playerPos.y: " << recvData.playerPos.y << std::endl;
-      std::cout << "playerPos.z: " << recvData.playerPos.z << std::endl;
-      std::cout << "globalChunkPos.x: " << recvData.globalChunkPos.x << std::endl;
-      std::cout << "globalChunkPos.y: " << recvData.globalChunkPos.y << std::endl;
-      std::cout << "globalChunkPos.z: " << recvData.globalChunkPos.z << std::endl;
-      //std::cout << "chunk[0]: " << (int)recvData.chunk[0] << std::endl;
-      //std::cout << "chunk[1]: " << (int)recvData.chunk[1] << std::endl;
-      //std::cout << "chunk[2]: " << (int)recvData.chunk[2] << std::endl;
+      //pos playerPos = {0,0,0};
+      MinecraftRegionLoader loader(playerPos);
+      std::vector<ChunkData*> chunks = loader.extractChunkData();
 
-      recvData.oreID = 26;
+      for(int i=0; i < chunks.size(); i++) {
+        chunks[i]->oreID = 26;
+        emit(Data(chunks[i], sizeof(ChunkData)));
+      }
 
-      //std::cout << "10 64 7: " << (int)recvData.chunk[16762-256] << std::endl;
-      //std::cout << "10 65 7: " << (int)recvData.chunk[16762] << std::endl;
-      //std::cout << "10 66 7: " << (int)recvData.chunk[16762+256] << std::endl;
-      //std::cout << "10 67 7: " << (int)recvData.chunk[16762+512] << std::endl;
-      emit(Data(&recvData, sizeof(chunkData)));
-      std::cout << "Waiting for connections on 12345..." << std::endl;
+      std::cout << "Produced " << chunks.size() << "chunks. Waiting for more data from mod..." << std::endl;
     }
-      
+
+    std::cout << "Minecraft Mod Disconnected" << std::endl;
   }
 };
 
@@ -151,10 +147,11 @@ class Generator : public InputSource {
 class PrintOp : public Operator{
   public:
     void processData(Data data){
-      std::cout << "chunk print recv data" << std::endl;
+
+      //std::cout << "chunk print recv data" << std::endl;
       aggData bestChunk = *(aggData*)data.value;
       std::vector<pos> ores = *(bestChunk.oreLocations);
-      std::cout << "ores size: " << ores.size() << std::endl;
+      //std::cout << "ores size: " << ores.size() << std::endl;
       for(int i=0; i<ores.size(); i++){
        std::cout <<"Chunk: " << bestChunk.chunkID.x << " " << bestChunk.chunkID.z << " " << bestChunk.chunkID.y << std::endl;
        std::cout <<"Good shit at pos:" << std::endl;
@@ -162,6 +159,8 @@ class PrintOp : public Operator{
        std::cout << "z: " << ores[i].z << std::endl;
        std::cout << "y: " << ores[i].y << std::endl;
       }
+      /*
+      */
       delete bestChunk.oreLocations;
     }
 };
@@ -169,16 +168,25 @@ class PrintOp : public Operator{
 int main(int argc, char** argv) {
   std::cout << "SPE Starting up." << std::endl;
 
+  int port = 12345;
+  listener.Bind(port);
+
+  std::cout << "Waiting for connection..." << std::endl;
+  if (listener.WaitForConnection() <= 0) {
+    std::cout << "Error - failed to connect" << std::endl;
+    return 0;
+  }
+
   Generator inputSource;
   ChunkProcessor op1;
-  ChunkSelect op2(1, 1);
+  ChunkSelect op2(1024, 1024);
   PrintOp op3;
 
   StreamProcessingEngine spe;
 
   spe.addInputSource(&inputSource, {&op1});
-  //spe.connectOperators(&op1, {&op2});
-  spe.connectOperators(&op1, {&op3});
+  spe.connectOperators(&op1, {&op2});
+  spe.connectOperators(&op2, {&op3});
 
   spe.run();
 

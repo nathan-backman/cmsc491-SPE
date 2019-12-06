@@ -1,5 +1,5 @@
 CXX=g++
-CFLAGS=-std=c++17 -Isrc -g -fmax-errors=1 -pthread
+CFLAGS=-std=c++17 -Isrc -g -fmax-errors=1 -pthread -lz
 
 SRC_FILES = $(shell find src/ -name '*.cpp')
 OBJ_FILES = $(SRC_FILES:.cpp=.o)
@@ -22,7 +22,7 @@ all: $(SAMPLE_APPS)
 -include $(DEP_FILES)
 
 apps/%.app: apps/%.cpp $(OBJ_FILES)
-	$(CXX) $(CFLAGS) -o $@ $^
+	$(CXX) $(CFLAGS) -o $@ $^ -lz
 
 tests/%/driver.app: tests/%/driver.cpp $(OBJ_FILES)
 	$(CXX) $(CFLAGS) -o $@ $^

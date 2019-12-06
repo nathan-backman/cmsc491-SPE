@@ -215,6 +215,28 @@ class TCPListener
             return bytesRead;
         }
 
+        /**
+         * Gets a string from the previously established socket connection. The
+         * string read from the stream is to be terminated at a '\n' character.
+         *
+         * @return A string containing the bytes read. It does not include the
+         *         newline character.
+         */
+        string GetLine()
+        {
+            char ch;
+            string retStr = "";
+            int retVal;
+            while ((retVal = recv(connSocket, &ch, 1, 0)) && ch != '\n') {
+                retStr = retStr + ch;
+                if (retVal == -1) {
+                    cerr << "TCPListener.h::GetLine() - " << strerror(errno)  << " (" << errno << ")" << endl;
+                    exit(1);
+                }
+            }
+            return retStr;
+        }
+
 
         /**
          * Sends a message to the connected computer
