@@ -127,8 +127,8 @@ class Generator : public InputSource {
       pos playerPos;
       is >> playerPos.x >> playerPos.y >> playerPos.z;
       std::cout << "Player pos at: " <<
-        playerPos.x << " "
-        playerPos.y << " "
+        playerPos.x << " " <<
+        playerPos.y << " " <<
         playerPos.z << std::endl;
 
       //pos playerPos = {0,0,0};
