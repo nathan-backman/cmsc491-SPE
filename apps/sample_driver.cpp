@@ -110,7 +110,7 @@ class ChunkProcessor : public Operator {
 
       dataToPass.chunkVal = count/calcDistance(chunk.playerPos, chunk.globalChunkPos);
 
-      std::cout << "[non-empty] chunk procesessor emit data with #ores:" << oreLocations->size() << std::endl;
+      //std::cout << "[non-empty] chunk procesessor emit data with #ores:" << oreLocations->size() << std::endl;
       emit(Data(&dataToPass, sizeof(aggData)));
     }
 };
@@ -126,6 +126,10 @@ class Generator : public InputSource {
       std::istringstream is(strPos);
       pos playerPos;
       is >> playerPos.x >> playerPos.y >> playerPos.z;
+      std::cout << "Player pos at: " <<
+        playerPos.x << " "
+        playerPos.y << " "
+        playerPos.z << std::endl;
 
       //pos playerPos = {0,0,0};
       MinecraftRegionLoader loader(playerPos);
