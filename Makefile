@@ -33,6 +33,10 @@ profiler/%/driver.app: profiler/%/driver.cpp $(OBJ_FILES)
 run: apps/sample_driver.app
 	$<
 
+apps/cam/webcam.app: apps/cam/webcam.cpp $(OBJ_FILES)
+	$(CXX) $(CFLAGS) -o $@ $^ `pkg-config --cflags --libs opencv` -lX11
+
+cam: apps/cam/webcam.app
 
 .PHONY: clean dbg lint format docs tests profiler
 clean:
