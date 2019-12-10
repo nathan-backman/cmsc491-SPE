@@ -59,7 +59,7 @@ class StreamProcessingEngine {
    * This involves launching threads for each InputSource as well as beginning
    * execution of the <span>Operator</span>s.
    */
-  void run();
+  void run(int numThreads);
 
  private:
   /**
@@ -69,6 +69,7 @@ class StreamProcessingEngine {
    * stored within \ref inputSources.
    */
   void launchInputs();
+  void threadRunner();
 
   /// A collection of references to each Operator in the workflow
   std::set<Operator*> ops;
@@ -81,6 +82,8 @@ class StreamProcessingEngine {
 
   /// Guard condition that's set to false when <span>InputSource</span>s finish
   bool receivingInput = true;
+
+  std::vector<std::thread> workerThreads;
 };
 
 #endif  // ENGINE_STREAMPROCESSINGENGINE_H_
