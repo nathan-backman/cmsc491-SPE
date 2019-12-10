@@ -17,6 +17,27 @@ struct FrameInfo {
   unsigned int frameNum;
 } typedef FrameInfo;
 
+class Edges : public Operator {
+  void processData(Data data) {
+    FrameInfo *fInfo= (FrameInfo*)data.value;
+    Mat &oldFrame = *(fInfo->frame);
+
+    int rows = oldFrame.rows;
+    int cols = oldFrame.cols;
+    Mat src_gray, detected_edges;
+    Mat *newFrame = new Mat(rows, cols, oldFrame.type());
+    cvtColor(oldFrame, src_gray, CV_BGR2GRAY);
+    blur(src_gray, detected_edges, Size(3, 3));
+    Canny(detected_edges, detected_edges, 100, 100*3, 3);
+
+    *newFrame = Scalar::all(0);
+    oldFrame.copyTo(*newFrame, detected_edges);
+
+    delete fInfo->frame;
+    fInfo->frame = newFrame;
+    emit(Data(fInfo, sizeof(FrameInfo), data.timestamp));
+  }
+};
 
 /*
 */
@@ -136,10 +157,13 @@ class FrameCapture : public InputSource {
 
     VideoCapture cap;
     // Open the camera. Index corresponds to: /dev/video[index]
-    if(!cap.open(2)) {
+    if(!cap.open(0)) {
       std::cout << "Failed to attach to webcam" << std::endl;
       exit(1);
     }
+
+    cap.set(CV_CAP_PROP_FRAME_WIDTH, 1920);
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 1080);
 
     unsigned int id = 0;
     bool keepCapturing = true;
@@ -168,7 +192,9 @@ int main(int argc, char** argv) {
   FrameCapture inOp;
   HorizontalFlip hFlipOp;
   Quad quadOp;
+  Quad quadOp2;
   NegativeCorners negCornersOp;
+  Edges edgeOp;
   OutputOp outOp;
 
   StreamProcessingEngine spe;
@@ -176,9 +202,11 @@ int main(int argc, char** argv) {
   spe.addInputSource(&inOp, {&hFlipOp});
   spe.connectOperators(&hFlipOp, {&quadOp});
   spe.connectOperators(&quadOp, {&negCornersOp});
-  spe.connectOperators(&negCornersOp, {&outOp});
+  spe.connectOperators(&negCornersOp, {&edgeOp});
+  spe.connectOperators(&edgeOp, {&quadOp2});
+  spe.connectOperators(&quadOp2, {&outOp});
 
-  spe.run();
+  spe.run(8);
 
   std::cout << "SPE Finished." << std::endl;
   return 0;
