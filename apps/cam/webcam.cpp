@@ -21,6 +21,7 @@ class Edges : public Operator {
   void processData(Data data) {
     FrameInfo *fInfo= (FrameInfo*)data.value;
     Mat &oldFrame = *(fInfo->frame);
+    int threshhold = 25;
 
     int rows = oldFrame.rows;
     int cols = oldFrame.cols;
@@ -28,7 +29,7 @@ class Edges : public Operator {
     Mat *newFrame = new Mat(rows, cols, oldFrame.type());
     cvtColor(oldFrame, src_gray, CV_BGR2GRAY);
     blur(src_gray, detected_edges, Size(3, 3));
-    Canny(detected_edges, detected_edges, 100, 100*3, 3);
+    Canny(detected_edges, detected_edges, threshhold, threshhold*3, 3);
 
     *newFrame = Scalar::all(0);
     oldFrame.copyTo(*newFrame, detected_edges);
