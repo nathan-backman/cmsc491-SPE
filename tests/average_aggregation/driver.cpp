@@ -1,7 +1,7 @@
 // Copyright 2019 [BVU CMSC491 class]
 #include <deque>
 #include <iostream>
-#include <string>
+#include <string.h>
 #include <vector>
 #include "SPE.h"
 
@@ -9,7 +9,8 @@ class FileReader : public InputSource {
   void generateData() {
     std::string line;
     while (getline(std::cin, line)) {
-      emit(Data(line));
+      const char* charData = line.c_str();
+      emit(Data((void*) charData, line.length() + 1));
     }
   }
 };
@@ -24,17 +25,19 @@ class AvgAggOp : public Operator {
     float total = 0;
     int count = 0;
     for (Data d : window) {
-      total += std::stoi(d.value);
+      total += std::atoi( (char*) d.value);
       count++;
     }
-    emit(Data(std::to_string(total / count)));
+    float out = total / count;
+
+    emit(Data(&out, sizeof(float)));
   }
 };
 
 // 4) Output (print) tuples
 class PrintData : public Operator {
  public:
-  void processData(Data data) { printf("%.1f\n", std::stof(data.value)); }
+  void processData(Data data) { printf("%.1f\n", *(float*) data.value ); }
 };
 
 int main(int argc, char** argv) {

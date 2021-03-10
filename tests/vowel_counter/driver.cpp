@@ -8,7 +8,8 @@ class FileReader : public InputSource {
   void generateData() {
     std::string line;
     while (getline(std::cin, line)) {
-      emit(Data(line));
+      const char* charVal = line.c_str();
+      emit(Data((void*) charVal, line.length() + 1));
     }
   }
 };
@@ -21,11 +22,13 @@ class FileReader : public InputSource {
 class FilterWords : public Operator {
  public:
   void processData(Data data) {
+    std::string dataVal = std::string((char*) data.value);
+
     int count = 0;
-    for (int i = 0; i < data.value.size(); i++) {
-      if (data.value[i] == 'i' || data.value[i] == 'o' ||
-          data.value[i] == 'u' || data.value[i] == 'e' ||
-          data.value[i] == 'a') {
+    for (int i = 0; i < dataVal.size(); i++) {
+      if (dataVal[i] == 'i' || dataVal[i] == 'o' ||
+          dataVal[i] == 'u' || dataVal[i] == 'e' ||
+          dataVal[i] == 'a') {
         count++;
       }
     }
@@ -38,7 +41,7 @@ class FilterWords : public Operator {
 // 2) Output (print) words
 class PrintData : public Operator {
  public:
-  void processData(Data data) { std::cout << data.value << std::endl; }
+  void processData(Data data) { std::cout << (char*) data.value << std::endl; }
 };
 
 int main(int argc, char** argv) {

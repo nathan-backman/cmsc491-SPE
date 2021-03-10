@@ -8,7 +8,8 @@ class FileReader : public InputSource {
   void generateData() {
     std::string line;
     while (getline(std::cin, line)) {
-      emit(Data(line));
+      const char* charVal = line.c_str();
+      emit(Data((void*) charVal, line.length() + 1));
     }
   }
 };
@@ -24,8 +25,9 @@ class FileReader : public InputSource {
 class DropEmail : public Operator {
  public:
   void processData(Data data) {
-    int domainInd = data.value.find("@");
-    std::string domain = data.value.substr(domainInd);
+    std::string dataVal = std::string( (char*) data.value);
+    int domainInd = dataVal.find("@");
+    std::string domain = dataVal.substr(domainInd);
     if (domain == "@bvu.edu") {
       emit(data);
     }
@@ -36,13 +38,17 @@ class DropEmail : public Operator {
 class IncrementGames : public Operator {
  public:
   void processData(Data data) {
-    int gamesInd = data.value.find(" ") + 1;
-    int games = std::stoi(data.value.substr(gamesInd, 1));
+    std::string dataVal = std::string( (char*) data.value);
+
+    int gamesInd = dataVal.find(" ") + 1;
+    int games = std::stoi(dataVal.substr(gamesInd, 1));
     games++;
 
-    std::string line = data.value;
+    std::string line = dataVal;
     line.replace(gamesInd, 1, std::to_string(games));
-    emit(Data(line, data.timestamp));
+
+    const char* charVal = line.c_str();
+    emit(Data((void*) charVal, line.length() + 1, data.timestamp));
   }
 };
 
@@ -50,8 +56,10 @@ class IncrementGames : public Operator {
 class DropGames : public Operator {
  public:
   void processData(Data data) {
-    int gamesInd = data.value.find(" ") + 1;
-    int games = std::stoi(data.value.substr(gamesInd, 1));
+    std::string dataVal = std::string( (char*) data.value);
+
+    int gamesInd = dataVal.find(" ") + 1;
+    int games = std::stoi(dataVal.substr(gamesInd, 1));
     if (games >= 8) {
       emit(data);
     }
@@ -62,16 +70,20 @@ class DropGames : public Operator {
 class TransformLine : public Operator {
  public:
   void processData(Data data) {
-    int domainInd = data.value.find("@");
-    std::string newstr = data.value.substr(0, domainInd);
-    emit(Data(newstr, data.timestamp));
+    std::string dataVal = std::string( (char*) data.value);
+
+    int domainInd = dataVal.find("@");
+    std::string newstr = dataVal.substr(0, domainInd);
+
+    const char* charVal = newstr.c_str();
+    emit(Data((void*) charVal, newstr.length() + 1, data.timestamp));
   }
 };
 
 // 5) Output (print) tuples
 class PrintData : public Operator {
  public:
-  void processData(Data data) { std::cout << data.value << std::endl; }
+  void processData(Data data) { std::cout << (char*) data.value << std::endl; }
 };
 
 int main(int argc, char** argv) {

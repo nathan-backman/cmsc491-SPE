@@ -8,7 +8,8 @@ class FileReader : public InputSource {
   void generateData() {
     std::string line;
     while (getline(std::cin, line)) {
-      emit(Data(line));
+      const char* charVal = line.c_str();
+      emit(Data((void*) charVal, line.length() + 1));
     }
   }
 };
@@ -26,7 +27,7 @@ class IdentityOp : public Operator {
 // 2) Output (print) tuples
 class PrintData : public Operator {
  public:
-  void processData(Data data) { std::cout << data.value << std::endl; }
+  void processData(Data data) { std::cout << (char*) data.value << std::endl; }
 };
 
 int main(int argc, char** argv) {

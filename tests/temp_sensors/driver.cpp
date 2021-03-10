@@ -8,7 +8,8 @@ class FileReader : public InputSource {
   void generateData() {
     std::string line;
     while (getline(std::cin, line)) {
-      emit(Data(line));
+      const char* charVal = line.c_str();
+      emit(Data((void*) charVal, line.length() + 1));
     }
   }
 };
@@ -23,7 +24,9 @@ class FileReader : public InputSource {
 class DropOdds : public Operator {
  public:
   void processData(Data data) {
-    int siteID = atoi(data.value.substr(5, data.value.find(" ") - 4).c_str());
+    std::string dataVal = std::string((char*) data.value);
+
+    int siteID = atoi(dataVal.substr(5, dataVal.find(" ") - 4).c_str());
     if (siteID % 2 == 0) {
       emit(data);
     }
@@ -34,15 +37,19 @@ class DropOdds : public Operator {
 class TransformTemp : public Operator {
  public:
   void processData(Data data) {
-    int start = data.value.find(" ") + 1;
-    float temp = std::stof(data.value.substr(start, data.value.size() - start));
+    std::string dataVal = std::string((char*) data.value);
+
+    int start = dataVal.find(" ") + 1;
+    float temp = std::stof(dataVal.substr(start, dataVal.size() - start));
     temp = temp - 32.0f;
 
     char tempBuf[8];
     snprintf(tempBuf, sizeof(tempBuf), "%+.1f", temp);
 
-    std::string newVal = data.value.substr(0, start) + std::string(tempBuf);
-    emit(Data(newVal, data.timestamp));
+    std::string newVal = dataVal.substr(0, start) + std::string(tempBuf);
+
+    const char* charVal = newVal.c_str();
+    emit(Data((void*) charVal, newVal.length() + 1, data.timestamp));
   }
 };
 
@@ -50,8 +57,10 @@ class TransformTemp : public Operator {
 class DropTemps : public Operator {
  public:
   void processData(Data data) {
-    int start = data.value.find(" ") + 1;
-    float temp = std::stof(data.value.substr(start, data.value.size() - start));
+    std::string dataVal = std::string((char*) data.value);
+
+    int start = dataVal.find(" ") + 1;
+    float temp = std::stof(dataVal.substr(start, dataVal.size() - start));
 
     if (temp >= -10.0 && temp <= 10.0) emit(data);
   }
@@ -60,7 +69,7 @@ class DropTemps : public Operator {
 // 4) Output (print) tuples
 class PrintData : public Operator {
  public:
-  void processData(Data data) { std::cout << data.value << std::endl; }
+  void processData(Data data) { std::cout << (char*) data.value << std::endl; }
 };
 
 int main(int argc, char** argv) {

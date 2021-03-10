@@ -1,7 +1,7 @@
 // Copyright 2019 [BVU CMSC491 class]
 #include <math.h>
 #include <iostream>
-#include <string>
+#include <string.h>
 #include <vector>
 #include "SPE.h"
 
@@ -9,7 +9,8 @@ class FileReader : public InputSource {
   void generateData() {
     std::string line;
     while (getline(std::cin, line)) {
-      emit(Data(line));
+      const char* charData = line.c_str();
+      emit(Data((void*) charData, line.length() + 1));
     }
   }
 };
@@ -23,10 +24,12 @@ class FileReader : public InputSource {
 class FarenheightOp : public Operator {
  public:
   void processData(Data data) {
-    int num = std::stoi(data.value);
+    std::string dataVal = std::string((char*) data.value);
+
+    int num = std::stoi(dataVal);
     int celsius = (num - 32) * (5.0 / 9.0);
-    data.value = std::to_string(celsius);
-    emit(data);
+
+    emit(Data(&celsius, sizeof(int) ));
   }
 };
 
@@ -34,15 +37,17 @@ class FarenheightOp : public Operator {
 class AddStringOp : public Operator {
  public:
   void processData(Data data) {
-    data.value = "Celsius Temperature: " + data.value;
-    emit(data);
+    std::string dataVal = "Celsius Temperature: " + std::to_string(*(int*) data.value);
+    const char* charData = dataVal.c_str();
+
+    emit(Data((void*) charData, dataVal.length() + 1));
   }
 };
 
 // 3) Output the data.
 class PrintData : public Operator {
  public:
-  void processData(Data data) { std::cout << data.value << std::endl; }
+  void processData(Data data) { std::cout << (char*) data.value << std::endl; }
 };
 
 int main(int argc, char** argv) {
